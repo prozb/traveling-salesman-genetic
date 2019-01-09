@@ -36,7 +36,7 @@ public class DNAPoolTest {
     }
 
     @Test
-    public void alternativeCrossOverTest1() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+    public void alternativeCrossOverTest1() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         DNAPool dnaPool = new DNAPool();
         Method method   = dnaPool.getClass().getDeclaredMethod("alternativeCrossOver", DNA.class, DNA.class,
                 Integer.class, Integer.class);
@@ -61,5 +61,28 @@ public class DNAPoolTest {
 
         Assert.assertArrayEquals(expected1, dnas[0].getGene());
         Assert.assertArrayEquals(expected2, dnas[1].getGene());
+    }
+
+    @Test
+    public void mutateGenesTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        DNAPool dnaPool = new DNAPool();
+        Method method   = dnaPool.getClass().getDeclaredMethod("mutateGenes", DNA.class, Integer.class, Integer.class);
+        method.setAccessible(true);
+
+        DNA dna  = new DNA(10);
+        int pos1 = 0;
+        int pos2 = 3;
+
+        int start1 = dna.getGene()[pos1];
+        int start2 = dna.getGene()[pos2];
+
+        method.invoke(dnaPool, dna, pos1, pos2);
+
+        int end1 = dna.getGene()[pos1];
+        int end2 = dna.getGene()[pos2];
+
+        Assert.assertEquals(start1, end2);
+        Assert.assertEquals(start2, end1);
+
     }
 }

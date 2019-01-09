@@ -123,7 +123,6 @@ public class DNAPool {
                 DNA new1 = null;
                 DNA new2 = null;
 
-
                 switch (crossOverSchema){
                     case 3: {
                         new1 = greedyCrossOver(dna1, dna2);
@@ -162,10 +161,13 @@ public class DNAPool {
         for(int i = nextGenPos; i < nextGeneration.length; i++){
             nextGeneration[i] = currentGeneration[getRandomPos()];
         }
-
         currentGeneration = nextGeneration;
-
         assert (int)(currentGeneration.length * recombinationRate) == crossOverPerf;
+    }
+
+    private int getDistance(int city1, int city2){
+        // TODO: 09.01.19 implement distance calculation
+        return 0;
     }
 
     private int getRandomPos(){
@@ -226,8 +228,9 @@ public class DNAPool {
         int mutationCount     = (int) (mutationRate * geneLen * generationLen) + 1;
         int mutationPerformed = 0;
 
-        int randGen = 0;
-        int randPos = 0;
+        int randGen  = 0;
+        int randPos  = 0;
+        int randPos1 = 0;
 
         int bestGenePos = getBestGenePos();
 
@@ -235,9 +238,10 @@ public class DNAPool {
             randGen = (int) (Math.random() * generationLen);
 
             if(randGen != bestGenePos) {
-                randPos = (int) (Math.random() * geneLen);
+                randPos  = getRandomPos();
+                randPos1 = getRandomPos();
 
-                currentGeneration[randGen].invertCell(randPos);
+                mutateGenes(currentGeneration[randGen], randPos, randPos1);
 
                 mutationCount--;
                 mutationPerformed++;
@@ -252,6 +256,12 @@ public class DNAPool {
         unsetBestGene();
         calcMaxFitnessOfGeneration();
         calcMinFitnessOfGeneration();
+    }
+
+    private void mutateGenes(DNA dna, Integer pos1, Integer pos2){
+        int c = dna.getGene()[pos1];
+        dna.getGene()[pos1] = dna.getGene()[pos2];
+        dna.getGene()[pos2] = c;
     }
 
     public void processReplication(){
