@@ -1,6 +1,7 @@
-ompiled class file
+#Compiled class file
 *.class
 
+tsp_genetic_solving.iml
 # Log file
 *.log
 
