@@ -1,9 +1,6 @@
 package task3;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Pavlo Rozbytskyi
@@ -12,6 +9,8 @@ import java.util.Optional;
 // after each generation loop you must recalculate fitness off all dna's and
 // figure out maximal and minimal fitness
 public class DNAPool {
+    private HashMap<Integer, Integer> alternativeMap;
+    private HashMap<Integer, Integer> alternativeMap1;
     private DNA[] currentGeneration;
     private DNA[] nextGeneration;
     private int maxFitness;
@@ -28,7 +27,8 @@ public class DNAPool {
     private int [] cities;
 
     public DNAPool(){
-
+        this.alternativeMap    = new HashMap<>();
+        this.alternativeMap1    = new HashMap<>();
     }
 
     // calculating fitness after each loop and after creating new generation
@@ -36,6 +36,7 @@ public class DNAPool {
         this.replicationSchema = replicationSchema;
         this.crossOverSchema   = crossOverSchema;
         this.recombinationRate = recombinationRate;
+        this.alternativeMap    = new HashMap<>();
 
         this.mutationRate  = mutationRate;
         this.generationLen = generationLen;
@@ -176,9 +177,42 @@ public class DNAPool {
         return null;
     }
 
-    private DNA[] alternativeCrossOver(DNA dna1, DNA dna2, int point1, int point2){
-        // TODO: 09.01.19 implement alternative cross over
-        return null;
+    private DNA[] alternativeCrossOver(DNA dna1, DNA dna2, Integer point1, Integer point2){
+        this.alternativeMap.clear();
+        this.alternativeMap1.clear();
+
+        Integer [] gene1     = dna1.getGene();
+        Integer [] gene2     = dna2.getGene();
+
+        for(int i = --point1; i < point2; i++){
+            alternativeMap.put(gene1[i], gene2[i]);
+            alternativeMap1.put(gene2[i], gene1[i]);
+        }
+
+        for(int i = 0; i < gene1.length; i++){
+            if(alternativeMap.containsKey(gene1[i])){
+                gene1[i] = alternativeMap.get(gene1[i]);
+            }else if(alternativeMap1.containsKey(gene1[i])){
+                gene1[i] = alternativeMap1.get(gene1[i]);
+            }
+
+            if(alternativeMap1.containsKey(gene2[i])){
+                gene2[i] = alternativeMap1.get(gene2[i]);
+            }else if(alternativeMap.containsKey(gene2[i])){
+                gene2[i] = alternativeMap.get(gene2[i]);
+            }
+        }
+
+        DNA [] dnas = new DNA[2];
+        DNA new1    = new DNA(dna1.getGene().length);
+        DNA new2    = new DNA(dna1.getGene().length);
+
+        new1.setGene(gene1);
+        new2.setGene(gene2);
+        dnas[0] = new1;
+        dnas[1] = new2;
+
+        return dnas;
     }
 
     public void sortGeneration(){
