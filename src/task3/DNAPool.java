@@ -2,6 +2,7 @@ package task3;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -12,6 +13,7 @@ import java.util.Optional;
 // figure out maximal and minimal fitness
 public class DNAPool {
     private DNA[] currentGeneration;
+    private DNA[] nextGeneration;
     private int maxFitness;
     private int minFitness;
     private int generationsCount;
@@ -23,6 +25,7 @@ public class DNAPool {
     private int crossOverSchema;
     private boolean finished;
     private boolean protect;
+    private int [] cities;
 
     public DNAPool(){
 
@@ -36,13 +39,20 @@ public class DNAPool {
 
         this.mutationRate  = mutationRate;
         this.generationLen = generationLen;
-        this.protect       = protect; // protecting best gene from mutation and cross over
+        // protecting best gene from mutation and cross over
+        this.protect       = protect;
+        //possible cities
+        this.cities        = new int[geneLen];
 
+        for(int i = 0; i < cities.length; i++){
+            cities[i] = i;
+        }
         createGenerations(generationLen, geneLen, initRate);
     }
 
     private void createGenerations(int generationLen, int geneLen, int initRate){
         this.currentGeneration = new DNA[generationLen];
+        this.nextGeneration    = new DNA[generationLen];
         this.geneLen           = geneLen;
         this.generationsCount  = 0;
 
@@ -57,20 +67,19 @@ public class DNAPool {
     /**
      * calculating max fitness of gen
      */
-    public void calcMaxFitnessOfGeneration(){
+    private void calcMaxFitnessOfGeneration(){
         Optional<DNA> dnaMaxFitness = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::getFitness));
         dnaMaxFitness.ifPresent(DNA -> maxFitness = DNA.getFitness());
 
         if(maxFitness == geneLen) {
             finished = true;
-            //printInfo();
         }
     }
 
     /**
      * calculating min fitness of gen
      */
-    public void calcMinFitnessOfGeneration(){
+    private void calcMinFitnessOfGeneration(){
         Optional<DNA> dnaMinFitness = Arrays.stream(currentGeneration).min(Comparator.comparing(DNA::getFitness));
         dnaMinFitness.ifPresent(DNA -> minFitness = DNA.getFitness());
     }
@@ -95,7 +104,7 @@ public class DNAPool {
         int crossOverPerf  = 0;
         int firstGenePos   = 0;
         int secondGenePos  = 0;
-        int randPos = 0;
+        int nextGenPos     = 0;
 
         int bestPos = getBestGenePos();
 
@@ -103,92 +112,72 @@ public class DNAPool {
             firstGenePos  = (int) (Math.random() * generationLen);
             secondGenePos = (int) (Math.random() * generationLen);
 
-            if(!(firstGenePos == bestPos || secondGenePos == bestPos)){
-                randPos = (int) (Math.random() * geneLen);
+            int firsRandPos = getRandomPos();
+            int secRandPos  = getRandomPos();
 
+            if(!(firstGenePos == bestPos || secondGenePos == bestPos)){
                 DNA dna1 = new DNA(geneLen);
                 DNA dna2 = new DNA(geneLen);
 
+                DNA new1 = null;
+                DNA new2 = null;
+
+
                 switch (crossOverSchema){
-                    case 1: {
-                        dna1 = crossOverOne(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos);
-                        dna2 = crossOverOne(currentGeneration[secondGenePos], currentGeneration[firstGenePos], randPos);
-                    }break;
+                    case 3: {
+                        new1 = greedyCrossOver(dna1, dna2);
+                        new2 = new DNA(36);
 
-                    case 2: {
-                        int randPos1 = randPosCrossOverTwo(randPos);
-                        dna1 = crossOverTwo(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos, randPos1, true);
-                        dna2 = crossOverTwo(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos, randPos1, false);
-                    }break;
+                        new2.setGene(Objects.requireNonNull(new1).getGene());
+                    }
+                    break;
+                    case 4: {
+                        if(firsRandPos > secondGenePos){
+                            int c       = secRandPos;
+                            secRandPos  = firsRandPos;
+                            firsRandPos = c;
+                        }
 
+                        DNA [] dnas = alternativeCrossOver(dna1, dna2, firsRandPos, secRandPos);
+                        new1 = Objects.requireNonNull(dnas)[0];
+                        new2 = Objects.requireNonNull(dnas[1]);
+                    }
+                    break;
                     default: {
                         Main.logger.error("Chose cross over schema");
                         Main.printError("Chose cross over schema");
                     }
                 }
 
-                currentGeneration[firstGenePos] = dna1;
-                currentGeneration[secondGenePos] = dna2;
+                nextGeneration[nextGenPos++] = new1;
+                nextGeneration[nextGenPos++] = new2;
 
                 crossOverCount--;
                 crossOverPerf++;
             }
         }while (crossOverCount > 0);
 
+        for(int i = nextGenPos; i < nextGeneration.length; i++){
+            nextGeneration[i] = currentGeneration[getRandomPos()];
+        }
+
+        currentGeneration = nextGeneration;
+
         assert (int)(currentGeneration.length * recombinationRate) == crossOverPerf;
     }
 
-    private int randPosCrossOverTwo(int pos){
-        int pos1 = 0;
-
-        do{
-            pos1 = (int)(Math.random() * geneLen);
-        }while (!(Math.abs(pos1 - pos) > geneLen / Constants.GENES_SCALE && Math.abs(pos1 - pos) < Constants.GENES_SCALE / 2));
-
-        return pos1;
+    private int getRandomPos(){
+        return (int)(Math.random() * geneLen);
     }
 
-    private DNA crossOverTwo(DNA DNA1, DNA DNA2, int randPos1, int randPos2, boolean first){
-        int pos2 = randPos1 > randPos2 ? randPos1 : randPos2;
-        int pos1 = randPos1 > randPos2 ? randPos2 : randPos1;
-
-        DNA newDNA = new DNA(DNA1.getGene().length);
-        Integer [] test1   = new Integer[Math.abs(pos1 - pos2)];
-        Integer [] test2   = new Integer[Math.abs(pos1 - pos2)];
-        System.arraycopy(DNA1.getGene(), pos1, test1, 0, Math.abs(pos1 - pos2));
-        System.arraycopy(DNA2.getGene(), pos1, test2, 0, Math.abs(pos1 - pos2));
-
-        int test1Fitness = (int) Arrays.stream(test1).filter(elem -> elem == 1).count();
-        int test2Fitness = (int) Arrays.stream(test2).filter(elem -> elem == 1).count();
-
-        test1 = test1Fitness > test2Fitness ? test1 : test2;
-
-        if(first) {
-            Integer[] testGene1 = new Integer[geneLen];
-            System.arraycopy(DNA1.getGene(), 0, testGene1, 0, pos1);
-            System.arraycopy(test1, 0, testGene1, pos1, test1.length);
-            System.arraycopy(DNA1.getGene(), pos2, testGene1, pos2, geneLen - pos2);
-
-            newDNA.setGene(testGene1);
-        }else {
-            Integer[] testGene2 = new Integer[geneLen];
-            System.arraycopy(DNA2.getGene(), 0, testGene2, 0, pos1);
-            System.arraycopy(test1, 0, testGene2, pos1, test1.length);
-            System.arraycopy(DNA2.getGene(), pos2, testGene2, pos2, geneLen - pos2);
-
-            newDNA.setGene(testGene2);
-        }
-        return newDNA;
+    private DNA greedyCrossOver(DNA dna1, DNA dna2){
+        // TODO: 09.01.19 implement greedy cross over
+        return null;
     }
-    public DNA crossOverOne(DNA DNA1, DNA DNA2, int randPos){
-        DNA newDNA = new DNA(DNA1.getGene().length);
-        Integer [] newGene = new Integer[DNA1.getGene().length];
 
-        System.arraycopy(DNA1.getGene(), 0, newGene, 0, randPos);
-        System.arraycopy(DNA2.getGene(), randPos, newGene, randPos, DNA1.getGene().length - randPos);
-
-        newDNA.setGene(newGene);
-        return newDNA;
+    private DNA[] alternativeCrossOver(DNA dna1, DNA dna2, int point1, int point2){
+        // TODO: 09.01.19 implement alternative cross over
+        return null;
     }
 
     public void sortGeneration(){
@@ -196,6 +185,7 @@ public class DNAPool {
     }
 
     public void processMutation(){
+        // TODO: 09.01.19 change mutation method
         setBestGene();
 
         int mutationCount     = (int) (mutationRate * geneLen * generationLen) + 1;
@@ -234,22 +224,12 @@ public class DNAPool {
             case 1:
                 replicationSchemaOne();
                 break;
-            case 2:
-                replicationSchemaTwo();
-                break;
             default:
                 throw new RuntimeException("please input replication schema");
         }
 
         calcMinFitnessOfGeneration();
         calcMaxFitnessOfGeneration();
-    }
-
-    // rank based selection
-    private void replicationSchemaTwo(){
-        processRanking();
-        passRankedGenesIntoGeneration();
-        clearRankings();
     }
 
     private void clearRankings(){
@@ -264,29 +244,6 @@ public class DNAPool {
             double prev = currentGeneration[rank - 1].getPsCum();
             currentGeneration[rank].calcCumulProbability(prev);
         }
-    }
-
-    private void passRankedGenesIntoGeneration(){
-        DNA [] newGeneration = new DNA[generationLen];
-        Arrays.fill(newGeneration, new DNA(geneLen));
-        for(int i = 0; i < newGeneration.length; i++){
-            newGeneration[i] = getBestRankedDNA();
-        }
-
-        this.currentGeneration = newGeneration;
-    }
-
-    private DNA getBestRankedDNA(){
-        double probability = Math.random();
-
-        for(int i = 1; i < currentGeneration.length; i++){
-            if(probability == currentGeneration[i - 1].getPsCum()){
-                return currentGeneration[i - 1];
-            }else if(probability <= currentGeneration[i].getPsCum() && probability > currentGeneration[i - 1].getPsCum()){
-                return currentGeneration[i];
-            }
-        }
-        return currentGeneration[currentGeneration.length - 1];
     }
 
     private void replicationSchemaOne(){
@@ -361,10 +318,4 @@ public class DNAPool {
             bestGene.ifPresent(DNA::unsetBest);
         }
     }
-
-    //TODO: print out rank based selection table for debugging reasons
-    public void printOutRankTable(){
-        Arrays.stream(currentGeneration).forEach(DNA::printRank);
-    }
-
 }

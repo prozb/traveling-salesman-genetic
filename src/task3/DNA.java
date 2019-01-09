@@ -39,6 +39,7 @@ public class DNA {
             cities.add(i);
         }
         Collections.shuffle(cities);
+        Collections.shuffle(cities);
 
         for(int i = 0; i < gene.length; i++){
             gene[i] = cities.get(i);
