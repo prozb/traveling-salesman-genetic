@@ -157,6 +157,7 @@ public class DNAPool {
             }
         }while (crossOverCount > 0);
 
+        //fill left genes with random genes
         for(int i = nextGenPos; i < nextGeneration.length; i++){
             nextGeneration[i] = currentGeneration[getRandomPos()];
         }
