@@ -4,12 +4,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import task3.DNA;
 import task3.DNAPool;
+import task3.Main;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 public class DNAPoolTest {
     @Test
@@ -153,5 +155,28 @@ public class DNAPoolTest {
 
         Assert.assertEquals(posArray[0], next);
         Assert.assertEquals(posArray[1], prev);
+    }
+
+    @Test
+    public void getCityWithLowestDistanceTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        int currentCity = 2;
+        DNAPool pool    = new DNAPool();
+
+        HashMap<Vector<Integer>, Double> distances = new HashMap<>();
+        distances.put(new Vector<>(1,2), 1.0d);
+        distances.put(new Vector<>(2,3), 10.0d);
+        distances.put(new Vector<>(1,3), 5.0d);
+        Main.setDistances(distances);
+
+        Integer [] cities = new Integer[2];
+        cities[0] = 1;
+        cities[1] = 3;
+
+        Method getCityWithLowestDistance = DNAPool.class.getDeclaredMethod("getCityWithLowestDistance", Integer[].class, Integer.TYPE);
+        getCityWithLowestDistance.setAccessible(true);
+        int cityActual = (int) getCityWithLowestDistance.invoke(pool, cities, currentCity);
+        int expected   = 1;
+
+        Assert.assertEquals(expected, cityActual);
     }
 }

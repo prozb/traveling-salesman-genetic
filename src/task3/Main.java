@@ -349,4 +349,12 @@ public class Main {
         }
         return 0d;
     }
+
+    /**
+     * setter for testing reasons
+     * @param _distances
+     */
+    public static void setDistances(HashMap<Vector<Integer>, Double> _distances){
+        distances = _distances;
+    }
 }

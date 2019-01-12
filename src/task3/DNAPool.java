@@ -1,5 +1,6 @@
 package task3;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -177,15 +178,32 @@ public class DNAPool {
         // TODO: 09.01.19 implement greedy cross over
         ArrayList<Integer> availableCities = getAvailableCities();
         Integer [] gene = new Integer[dna1.getGene().length];
+        Integer [] citiesArray = null;
 
         int currentCity    = dna1.getGene()[0];
         int currentPosDna1 = 0;
         int currentPosDna2 = 0;
 
         ArrayList<Integer> nextCities = new ArrayList<>();
+        int [] next;
 
         for(int i = 0; i < gene.length; i++){
+            citiesArray    = availableCities.toArray(new Integer[availableCities.size()]);
+            currentPosDna2 = dna2.getGene()[currentPosDna2];
 
+            next = getNextPos(currentCity, gene);
+
+            //adding all cities to next cities array list if they are available
+            if(availableCities.contains(next[0]))
+                nextCities.add(next[0]);
+            if(availableCities.contains(next[1]))
+                nextCities.add(next[1]);
+            if(availableCities.contains(currentPosDna2))
+                nextCities.add(currentPosDna2);
+
+            //get city with lowest distance to current city
+            int nextCity = getCityWithLowestDistance(citiesArray, currentCity);
+            // TODO: 12.01.19 update nextCities array list
         }
 
         DNA newDna = new DNA(geneLen);
@@ -194,6 +212,23 @@ public class DNAPool {
         return newDna;
     }
 
+    //figuring out city with lowest distance to current city
+    private int getCityWithLowestDistance(Integer[] cities, int currentCity){
+        if(cities != null && cities.length > 0) {
+            int city = cities[0];
+            double dist = getDistance(currentCity, city);
+
+            for (int i = 1; i < cities.length; i++) {
+                double nextDist = getDistance(currentCity, cities[i]);
+                if (nextDist < dist){
+                    city = cities[i];
+                    dist = nextDist;
+                }
+            }
+            return city;
+        }
+        return 0;
+    }
     //calculating next position according to current position
     private int [] getNextPos(int pos, Integer [] array){
         int [] next  = new int [2];
