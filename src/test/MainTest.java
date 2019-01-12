@@ -4,8 +4,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import task3.Main;
 
+import java.lang.annotation.Native;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Vector;
 
 public class MainTest {
     @Test
@@ -58,5 +61,28 @@ public class MainTest {
         double actualDist   = (double) calcDistanceBetween.invoke(main, cities, val1, val2);
 
         Assert.assertEquals(actualDist, expectedDist, 0.00001);
+    }
+
+    @Test
+    public void calculateDistancesTest(){
+        int size  = 4;
+        int count = 6;
+
+        int [][] cities =              {{1,0,0,3},
+                                        {0,0,0,0},
+                                        {0,4,0,0},
+                                        {2,0,0,0}};
+        Main.calculateDistances(cities, size);
+        HashMap<Vector<Integer>, Double> distances = Main.getDistances();
+
+        Assert.assertEquals(distances.size(), count);
+    }
+
+    private int calcFactorial(int n){
+        if(n < 2){
+            return n;
+        }
+
+        return n * calcFactorial(n - 1);
     }
 }

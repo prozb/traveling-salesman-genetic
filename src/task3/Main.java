@@ -18,7 +18,7 @@ import org.apache.log4j.*;
  */
 public class Main {
     private static String TAG = "Main";
-    private static HashMap<Vector<Integer>, Integer> distances;
+    private static HashMap<Vector<Integer>, Double> distances;
     private static int generationCount;
     private static int geneLen;
     private static int replicationSchema;
@@ -239,12 +239,30 @@ public class Main {
                 "[--protect] the best gene is crossover and mutation protected (best|none)");
     }
 
-    private static void calculateDistances(int [][] cities){
+    //fill hashmap with distances between cities
+    public static void calculateDistances(int [][] cities, int citiesCount){
         distances = new HashMap<>();
 
-        for(int i = 1; i < (cities.length - 4); i++){
-            for(int j = i; j < (cities.length - 4); j++){
+        Vector<Integer> cityPair1 = new Vector<>();
+        Vector<Integer> cityPair2 = new Vector<>();
 
+        for(int i = 1; i <= citiesCount; i++){
+            for(int j = i + 1; j <= citiesCount; j++){
+                cityPair1.clear();
+                cityPair2.clear();
+
+                cityPair1.add(i);
+                cityPair1.add(j);
+                cityPair2.add(j);
+                cityPair2.add(i);
+
+                if(!distances.containsKey(cityPair1) || !distances.containsKey(cityPair2)){
+                    double dist = calcDistanceBetween(cities, i, j);
+                    Vector<Integer> v = new Vector<>();
+                    v.add(i);
+                    v.add(j);
+                    distances.put(v, dist);
+                }
             }
         }
     }
@@ -297,5 +315,9 @@ public class Main {
         double dy = city2y - city1y;
 
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public static HashMap<Vector<Integer>, Double> getDistances(){
+        return distances;
     }
 }

@@ -83,6 +83,5 @@ public class DNAPoolTest {
 
         Assert.assertEquals(start1, end2);
         Assert.assertEquals(start2, end1);
-
     }
 }
