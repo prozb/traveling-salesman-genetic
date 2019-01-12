@@ -10,9 +10,9 @@ public class Constants {
     public final static int S            = 5;      //ranking constant
     public final static float PC_MIN     = 0.5f;
 //    public final static float PC_MAX     = 0.54f;
-    public final static float PC_MAX     = 0.9f;
+    public final static float PC_MAX     = 0.5f;
     public final static float PC_STEP    = 0.02f;
-    public final static float PM_MIN     = 0.000f;
+    public final static float PM_MIN     = 0.03f;
 //    public final static float PM_MAX     = 0.008f;
     public final static float PM_MAX     = 0.03f;
 //    public final static float PM_MAX     = 0.002f;

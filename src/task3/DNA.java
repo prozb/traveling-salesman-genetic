@@ -43,7 +43,7 @@ public class DNA {
         this.gene = new Integer[len];
 
         List<Integer> cities = new ArrayList<>();
-        for(int i = 0; i < gene.length; i++){
+        for(int i = 1; i <= gene.length; i++){
             cities.add(i);
         }
         Collections.shuffle(cities);

@@ -60,16 +60,16 @@ public class Simulation implements Callable<String>{
     }
 
     public String call() {
-        try {
+//        try {
 //            if(isGraph)
                 graphSimulation();
 //            else {
 //                startSimulation();
 //                printStatistics();
 //            }
-        }catch (Exception e){
-            Main.printError("Cannot execute simulation " + e.toString(), TAG);
-        }
+//        }catch (Exception e){
+//            Main.printError("Cannot execute simulation " + e.toString(), TAG);
+//        }
         Main.logger.info("Thread #" + Thread.currentThread().getId() + " finished");
 
         return sb.toString();

@@ -69,6 +69,12 @@ public class Main {
         logger.info("Program started at " + sdfDate.format(date));
         logger.info("Creating " + Constants.THREADS_NUM + " threads");
 
+        // TODO: 12.01.19
+        TextProcessor processor = new TextProcessor();
+        int [][] map = processor.readFileTSP("file.64");
+        calculateDistances(map, geneLen);
+        // TODO: 12.01.19
+
         //creating simulations to be executed by thread pool
         if(Constants.GRAPH_SIMULATION) {
             for (int i = 0; i < permNumber; i++) {
@@ -79,7 +85,7 @@ public class Main {
             }
         }else{
             Callable<String> simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate,
-                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, new Point(recombinationRate, mutationRate),
+                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, new Point(mutationRate, recombinationRate),
                     Constants.GRAPH_SIMULATION, 0);
             simulations.add(simulation);
         }

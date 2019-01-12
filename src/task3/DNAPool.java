@@ -1,5 +1,7 @@
 package task3;
 
+import org.mockito.internal.util.collections.ArrayUtils;
+
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -92,6 +94,8 @@ public class DNAPool {
         calcMinFitnessOfGeneration();
         calcMaxFitnessOfGeneration();
         generationsCount++;
+
+        currentGeneration = nextGeneration;
     }
 
     // created for testing reasons
@@ -129,9 +133,8 @@ public class DNAPool {
                 switch (crossOverSchema){
                     case 3: {
                         new1 = greedyCrossOver(dna1, dna2);
-                        new2 = new DNA(36);
 
-                        new2.setGene(Objects.requireNonNull(new1).getGene());
+                        nextGeneration[nextGenPos++] = new1;
                     }
                     break;
                     case 4: {
@@ -144,15 +147,15 @@ public class DNAPool {
                         DNA [] dnas = alternativeCrossOver(dna1, dna2, firsRandPos, secRandPos);
                         new1 = Objects.requireNonNull(dnas)[0];
                         new2 = Objects.requireNonNull(dnas[1]);
+
+                        nextGeneration[nextGenPos++] = new1;
+                        nextGeneration[nextGenPos++] = new2;
                     }
                     break;
                     default: {
                         Main.printError("Chose cross over schema",TAG);
                     }
                 }
-
-                nextGeneration[nextGenPos++] = new1;
-                nextGeneration[nextGenPos++] = new2;
 
                 crossOverCount--;
                 crossOverPerf++;
@@ -338,7 +341,7 @@ public class DNAPool {
     }
 
     public void sortGeneration(){
-        Arrays.sort(currentGeneration, Comparator.comparing(DNA::getFitness));
+        Arrays.sort(currentGeneration, Comparator.comparing(DNA::getFitness).reversed());
     }
 
     public void processMutation(){
@@ -396,27 +399,15 @@ public class DNAPool {
         calcMaxFitnessOfGeneration();
     }
 
-    private void clearRankings(){
-        Arrays.stream(currentGeneration).forEach(DNA::clearPs);
-    }
-
-    private void processRanking(){
-        currentGeneration[0].calcProbability(0, generationLen);
-
-        for(int rank = 1; rank < currentGeneration.length; rank++){
-            currentGeneration[rank].calcProbability(rank, generationLen);
-            double prev = currentGeneration[rank - 1].getPsCum();
-            currentGeneration[rank].calcCumulProbability(prev);
-        }
-    }
-
     private void replicationSchemaOne(){
-        int selectionPercent = 10;
+        DNA[] bestDNAS = getBestGenes();
 
-        DNA[] bestDNAS = getBestGenes(selectionPercent);
+        for(int i = 0; i < nextGeneration.length / 2; i++){
+            nextGeneration[i] = bestDNAS[getRandomPos(1)];
+        }
 
-        for(int i = 0; i < currentGeneration.length; i++){
-            currentGeneration[i] = bestDNAS[i / 10];
+        for(int i = nextGeneration.length / 2; i < nextGeneration.length; i++){
+            nextGeneration[i] = currentGeneration[getRandomPos(generationsCount)];
         }
     }
 
@@ -429,8 +420,8 @@ public class DNAPool {
         return bestPos;
     }
 
-    public DNA[] getBestGenes(int selectionPercent){
-        int selectCount = (int) (selectionPercent / 100.0f * generationLen);
+    public DNA[] getBestGenes(){
+        int selectCount = 2;
 
         return Arrays.copyOfRange(currentGeneration, currentGeneration.length - selectCount, currentGeneration.length);
     }
@@ -452,7 +443,7 @@ public class DNAPool {
     }
 
     public boolean isFinished(){
-        if(maxFitness >= geneLen){
+        if(minFitness <= geneLen){
             return true;
         }
         return false;
