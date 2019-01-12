@@ -203,7 +203,17 @@ public class DNAPool {
 
             //get city with lowest distance to current city
             int nextCity = getCityWithLowestDistance(citiesArray, currentCity);
-            // TODO: 12.01.19 update nextCities array list
+
+            if(nextCity == next[0]){
+
+            }else if(nextCity == next[1]){
+
+            }else if(nextCity == currentPosDna2){
+                currentPosDna2++;
+            }else if(nextCity == -1){
+                //get random city
+            }
+            availableCities.remove(nextCity);
         }
 
         DNA newDna = new DNA(geneLen);
@@ -212,6 +222,22 @@ public class DNAPool {
         return newDna;
     }
 
+    //calculating next position in first dna for greedy crossover
+    private int newCityPos(Integer[] cities, int pos, boolean right){
+        int nextPos = -1;
+
+        if(right && pos + 1 < cities.length && pos >= 0){
+            nextPos = pos + 1;
+        }if(right && pos == cities.length - 1 && pos >= 0 && pos < cities.length){
+            nextPos = 0;
+        }else if (!right && pos - 1 >= 0 && pos < cities.length){
+            nextPos = pos - 1;
+        }else if(!right && pos == 0 && pos < cities.length){
+            nextPos = cities.length - 1;
+        }
+
+        return nextPos;
+    }
     //figuring out city with lowest distance to current city
     private int getCityWithLowestDistance(Integer[] cities, int currentCity){
         if(cities != null && cities.length > 0) {
@@ -227,7 +253,7 @@ public class DNAPool {
             }
             return city;
         }
-        return 0;
+        return -1;
     }
     //calculating next position according to current position
     private int [] getNextPos(int pos, Integer [] array){

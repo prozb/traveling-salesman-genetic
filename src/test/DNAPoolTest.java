@@ -179,4 +179,79 @@ public class DNAPoolTest {
 
         Assert.assertEquals(expected, cityActual);
     }
+
+    @Test
+    public void newCityPosTest_posZeroRight() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        DNAPool dnaPool = new DNAPool();
+        Method newCityPos = dnaPool.getClass().getDeclaredMethod("newCityPos", Integer[].class, Integer.TYPE, Boolean.TYPE);
+        newCityPos.setAccessible(true);
+
+        Integer[] arr = new Integer[10];
+        int pos     = 0;
+        int nextPos = 1;
+
+        int expected = (int)newCityPos.invoke(dnaPool, arr, pos, true);
+
+        Assert.assertEquals(expected, nextPos);
+    }
+
+    @Test
+    public void newCityPosTest_posSizeRight() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        DNAPool dnaPool = new DNAPool();
+        Method newCityPos = dnaPool.getClass().getDeclaredMethod("newCityPos", Integer[].class, Integer.TYPE, Boolean.TYPE);
+        newCityPos.setAccessible(true);
+
+        Integer[] arr = new Integer[10];
+        int pos     = arr.length - 1;
+        int nextPos = 0;
+
+        int expected = (int)newCityPos.invoke(dnaPool, arr, pos, true);
+
+        Assert.assertEquals(expected, nextPos);
+    }
+
+    @Test
+    public void newCityPosTest_posSizeLeft() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        DNAPool dnaPool = new DNAPool();
+        Method newCityPos = dnaPool.getClass().getDeclaredMethod("newCityPos", Integer[].class, Integer.TYPE, Boolean.TYPE);
+        newCityPos.setAccessible(true);
+
+        Integer[] arr = new Integer[10];
+        int pos     = arr.length - 1;
+        int nextPos = pos - 1;
+
+        int expected = (int)newCityPos.invoke(dnaPool, arr, pos, false);
+
+        Assert.assertEquals(expected, nextPos);
+    }
+
+    @Test
+    public void newCityPosTest_posZeroLeft() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        DNAPool dnaPool = new DNAPool();
+        Method newCityPos = dnaPool.getClass().getDeclaredMethod("newCityPos", Integer[].class, Integer.TYPE, Boolean.TYPE);
+        newCityPos.setAccessible(true);
+
+        Integer[] arr = new Integer[10];
+        int pos     = 0;
+        int nextPos = arr.length - 1;
+
+        int expected = (int)newCityPos.invoke(dnaPool, arr, pos, false);
+
+        Assert.assertEquals(expected, nextPos);
+    }
+
+    @Test
+    public void newCityPosTest_incorrectPos() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        DNAPool dnaPool = new DNAPool();
+        Method newCityPos = dnaPool.getClass().getDeclaredMethod("newCityPos", Integer[].class, Integer.TYPE, Boolean.TYPE);
+        newCityPos.setAccessible(true);
+
+        Integer[] arr = new Integer[10];
+        int pos     = -1;
+        int nextPos = -1;
+
+        int expected = (int)newCityPos.invoke(dnaPool, arr, pos, false);
+
+        Assert.assertEquals(expected, nextPos);
+    }
 }
