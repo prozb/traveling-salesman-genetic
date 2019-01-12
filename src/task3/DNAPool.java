@@ -16,8 +16,8 @@ public class DNAPool {
     private HashMap<Integer, Integer> alternativeMap1;
     private DNA[] currentGeneration;
     private DNA[] nextGeneration;
-    private int maxFitness;
-    private int minFitness;
+    private double maxFitness;
+    private double minFitness;
     private int generationsCount;
     private int generationLen;
     private int geneLen;
@@ -439,11 +439,11 @@ public class DNAPool {
         return generationsCount;
     }
 
-    public int getMaxFitness(){
+    public double getMaxFitness(){
         return maxFitness;
     }
 
-    public int getMinFitness() {
+    public double getMinFitness() {
         return minFitness;
     }
 

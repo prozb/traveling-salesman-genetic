@@ -10,7 +10,7 @@ public class DNA {
     private int len;
     private double ps;      // probability to be chosen
     private double psCum;   // cumulated probability
-    private Integer fitness;
+    private double fitness;
     private Integer [] gene;
     private boolean best;
 
@@ -22,10 +22,18 @@ public class DNA {
         calcFitness();
     }
 
-
-    // TODO: 09.01.19 Should be overwritten 
     public void calcFitness(){
-        this.fitness = (int) Arrays.stream(gene).filter(elem -> 1 == elem).count();
+        this.fitness = 0;
+
+        int x = 0;
+        int y = 0;
+
+        for(int i = 0; i < gene.length - 1; i++){
+            x = gene[i];
+            y = gene[i + 1];
+
+            fitness +=  Main.getDistanceBetweenTwoCities(x, y);
+        }
     }
 
     /**
@@ -59,24 +67,6 @@ public class DNA {
         return best;
     }
 
-    public void invertCell(int pos){
-        gene[pos] = gene[pos] == 0 ? 1 : 0;
-    }
-    // returns true if cell can be set
-    private boolean setCell(int pos){
-        try {
-            if(gene[pos] == 0){
-                gene[pos] = 1;
-
-                return true;
-            }else{
-                return false;
-            }
-        }catch (ArrayIndexOutOfBoundsException e){
-            return false;
-        }
-    }
-
     /**
      * sets gene and recalculates fitness
      * @param gene gene must be set
@@ -91,7 +81,7 @@ public class DNA {
         return gene;
     }
 
-    public Integer getFitness() {
+    public double getFitness() {
         calcFitness();
 
         return fitness;
