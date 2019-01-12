@@ -18,7 +18,7 @@ import org.apache.log4j.*;
  */
 public class Main {
     private static String TAG = "Main";
-
+    private static HashMap<Vector<Integer>, Integer> distances;
     private static int generationCount;
     private static int geneLen;
     private static int replicationSchema;
@@ -237,5 +237,65 @@ public class Main {
                 "[--maxgen] maximum generations (integer number)\n" +
                 "[--runs] number of runs (integer number)\n" +
                 "[--protect] the best gene is crossover and mutation protected (best|none)");
+    }
+
+    private static void calculateDistances(int [][] cities){
+        distances = new HashMap<>();
+
+        for(int i = 1; i < (cities.length - 4); i++){
+            for(int j = i; j < (cities.length - 4); j++){
+
+            }
+        }
+    }
+
+    //found distance between 2 cities
+    private static double calcDistanceBetween(int [][] cities, int city1, int city2){
+        int city1x = 0;
+        int city1y = 0;
+
+        int city2x = 0;
+        int city2y = 0;
+
+        boolean city1Found = false;
+        boolean city2Found = false;
+
+        for(int i = 0; i < cities.length; i++){
+            boolean breakLoop = false;
+            for(int j = 0; j < cities[0].length; j++){
+                if(cities[i][j] == 0)
+                    continue;
+                if(cities[i][j] == city1 && !city1Found){
+                    city1x = i;
+                    city1y = j;
+
+                    city1Found = true;
+                }
+
+                if(cities[i][j] == city2 && !city2Found){
+                    city2x = i;
+                    city2y = j;
+
+                    city2Found = true;
+                }
+
+                if(city1Found && city2Found) {
+                    breakLoop = true;
+                    break;
+                }
+            }
+            if(breakLoop)
+                break;
+        }
+
+        return calcPythagoras(city1x, city1y, city2x, city2y);
+    }
+
+    //using pythagoras formula to calculate distance
+    private static double calcPythagoras(int city1x, int city1y, int city2x, int city2y) {
+        double dx = city2x - city1x;
+        double dy = city2y - city1y;
+
+        return Math.sqrt(dx * dx + dy * dy);
     }
 }

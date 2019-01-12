@@ -90,7 +90,6 @@ public class Simulation implements Callable<String>{
         exportToBuffer(mutationRate, recombinationRate, genCount);
         Main.logger.debug("===> Thread $" + Thread.currentThread().getId() + " simulation #" + posSimul + " finished");
 
-//        sb.append("\n");
     }
 
     private void exportToBuffer(float pc, float pm, float averCount){
