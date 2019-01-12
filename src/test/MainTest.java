@@ -4,12 +4,16 @@ import org.junit.Assert;
 import org.junit.Test;
 import task3.Main;
 
-import java.lang.annotation.Native;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Vector;
 
+/**
+ * Main class Test
+ * @author p.rozbytskyi
+ * @version 1.0.0
+ */
 public class MainTest {
     @Test
     public void calcPythagorasTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -78,11 +82,27 @@ public class MainTest {
         Assert.assertEquals(distances.size(), count);
     }
 
-    private int calcFactorial(int n){
-        if(n < 2){
-            return n;
-        }
+    @Test
+    public void getDistanceBetweenTwoCitiesTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        int size  = 4;
+        int city1 = 1;
+        int city2 = 3;
 
-        return n * calcFactorial(n - 1);
+        int [][] cities =  {{1,0,0,3},
+                            {0,0,0,0},
+                            {0,4,0,0},
+                            {2,0,0,0}};
+
+        Main main = new Main();
+
+        Main.calculateDistances(cities, size);
+        Method calcDistanceBetween = Main.class.getDeclaredMethod("calcDistanceBetween", int [][].class,
+                Integer.TYPE, Integer.TYPE);
+        calcDistanceBetween.setAccessible(true);
+
+        double expected   = (double) calcDistanceBetween.invoke(main, cities, city1, city2);
+        double actual     = Main.getDistanceBetweenTwoCities(city1, city2);
+
+        Assert.assertEquals(actual, expected, 0.00001);
     }
 }

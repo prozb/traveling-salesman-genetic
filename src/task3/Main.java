@@ -14,7 +14,7 @@ import org.apache.log4j.*;
 
 /**
  * @author Pavlo Rozbytskyi
- * @version 3.0.1
+ * @version 4.0.1
  */
 public class Main {
     private static String TAG = "Main";
@@ -317,7 +317,36 @@ public class Main {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    /**
+     * getting distances hashmap
+     * @return
+     */
     public static HashMap<Vector<Integer>, Double> getDistances(){
         return distances;
+    }
+
+    /**
+     * getting distance between 2 cities from distances hashmap
+     * @param city1 first city
+     * @param city2 second city
+     * @return distance double
+     */
+    public static double getDistanceBetweenTwoCities(int city1, int city2){
+        Vector<Integer> distKey = new Vector<>();
+        distKey.add(city1);
+        distKey.add(city2);
+
+        if(distances.containsKey(distKey)){
+            return distances.get(distKey);
+        }else{
+            distKey.clear();
+            distKey.add(city2);
+            distKey.add(city1);
+
+            if(distances.containsKey(distKey)){
+                return distances.get(distKey);
+            }
+        }
+        return 0d;
     }
 }
