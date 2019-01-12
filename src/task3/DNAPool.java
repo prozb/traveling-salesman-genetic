@@ -9,6 +9,7 @@ import java.util.*;
 // after each generation loop you must recalculate fitness off all dna's and
 // figure out maximal and minimal fitness
 public class DNAPool {
+    private static String TAG = "DNAPool";
     private HashMap<Integer, Integer> alternativeMap;
     private HashMap<Integer, Integer> alternativeMap1;
     private DNA[] currentGeneration;
@@ -144,8 +145,7 @@ public class DNAPool {
                     }
                     break;
                     default: {
-                        Main.logger.error("Chose cross over schema");
-                        Main.printError("Chose cross over schema");
+                        Main.printError("Chose cross over schema",TAG);
                     }
                 }
 

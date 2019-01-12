@@ -17,6 +17,8 @@ import org.apache.log4j.*;
  * @version 3.0.1
  */
 public class Main {
+    private static String TAG = "Main";
+
     private static int generationCount;
     private static int geneLen;
     private static int replicationSchema;
@@ -150,16 +152,16 @@ public class Main {
     private static void processUserInput(){
         if(arguments.length <= 1){
             printHelpMessage();
-            printError("No parameters!");
+            printError("No parameters!", TAG);
         }else if(arguments[1].equals("--help")){
             printHelpMessage();
             System.exit(99);
         }else if(arguments.length < Constants.NUM_OF_ARGS){
             printHelpMessage();
-            printError("Not enough parameters!");
+            printError("Not enough parameters!", TAG);
         }else if(arguments.length > Constants.NUM_OF_ARGS){
             printHelpMessage();
-            printError("To many parameters!");
+            printError("To many parameters!", TAG);
         }else {
             generationCount   = (int) getValue("--genecount");
             geneLen           = (int) getValue("--genelen");
@@ -188,7 +190,7 @@ public class Main {
         try {
             val = Float.parseFloat(num);
         }catch (NumberFormatException e){
-            printError("Number \"" + arg + "\" not found!");
+            printError("Number \"" + arg + "\" not found!", TAG);
         }
         return val;
     }
@@ -205,7 +207,7 @@ public class Main {
 
         if(val.equals("")){
             logger.error("Incorrect protect option input");
-            printError("protect option can not be empty!");
+            printError("protect option can not be empty!", TAG);
         }
 
         return val.trim();
@@ -214,9 +216,10 @@ public class Main {
     /**
      * Prints error out logs it and terminates program
      * @param err
+     * @param TAG
      */
-    public static void printError(String err){
-        logger.error(err);
+    public static void printError(String err, String TAG){
+        logger.error(TAG + " " + err);
         System.out.println("Error: " + err);
         System.exit(99);
     }

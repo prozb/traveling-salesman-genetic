@@ -3,79 +3,48 @@ package task3;
 import java.io.*;
 import java.util.Arrays;
 
+/**
+ * Class handles all file inputs and outputs
+ * @author p.rozbytskyi
+ * @version 1.0.0
+ */
 public class TextProcessor {
-    private static float pc;
-    private static float pm;
-    private static float gens;
-    private static boolean firstRun;
+    private static String TAG = "TextProcessor";
 
-    public static void main(String[] args) throws IOException {
-        firstRun = true;
+    /**
+     * reading from file and creating cities array
+     * @param fName file name
+     * @return return cities array
+     */
+    public int [][] readFileTSP(String fName) {
+        int [][] tspCities = null;
+        boolean citiesCountFound = false;
 
-        BufferedReader reader = new BufferedReader(new FileReader("/Users/p.rozbytskyi/Desktop/GP_Abgabe/schema_2_protect_none.txt"));
+        File file = new File(fName);
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line = "";
+            String [] arr = null;
 
-        String read = reader.readLine();
-        while (read != null){
-//            s = changeFirstTwoCols(s);
-//            s = s.replace(",", "\t\t");
-//            System.out.println(s);
-
-//            sb.append(s);
-//            sb.append("\n");
-            if(!read.equals("")) {
-                findBestPmPc(read);
+            int i = 0;
+            while ((line = reader.readLine()) != null){
+                int j = 0;
+                arr = line.split(" ");
+                if(!citiesCountFound){
+                    tspCities   = new int [arr.length][arr.length];
+                    citiesCountFound = true;
+                }
+                for(int k = 0; k < arr.length; k++){
+                    tspCities[i][j] = Integer.parseInt(arr[k]);
+                    j++;
+                }
+                i++;
             }
-            read = reader.readLine();
+
+            return tspCities;
+       } catch (Exception e) {
+            Main.printError(e.getMessage(), TAG);
         }
-
-        reader.close();
-        System.out.printf("Best pc = %.3f pm = %.3f gens = %.3f", pc, pm, gens);
-
-//        BufferedWriter writer = new BufferedWriter(new FileWriter("plot1.txt"));
-//        writer.write(sb.toString());
-//        writer.flush();
-//        writer.close();
-    }
-
-    public static void findBestPmPc(String s){
-        String [] sArr = s.replaceAll("\t+", ",").split(",");
-        if(firstRun && sArr.length > 0){
-            pc = Float.parseFloat(sArr[0]);
-            pm = Float.parseFloat(sArr[1]);
-            gens = Float.parseFloat(sArr[2]);
-            firstRun = false;
-        }else if(sArr.length > 0){
-            float relGen = Float.parseFloat(sArr[2]);
-
-            if(relGen < gens){
-                gens = relGen;
-                pc = Float.parseFloat(sArr[0]);
-                pm = Float.parseFloat(sArr[1]);
-            }
-        }
-    }
-    public static String changeFirstTwoCols(String s){
-        String[] sArr = s.split(" ");
-        if(!(sArr.length <= 1)) {
-            String change = sArr[0];
-            sArr[0] = sArr[1];
-            sArr[1] = change;
-
-            String res = Arrays.toString(sArr);
-            res = res.replace("]", "");
-            res = res.replace("[", "");
-            res = res.replace(" ", "");
-            res = res.trim();
-
-            return res;
-        }
-        return s;
-    }
-
-    public static String processLine(String s){
-        s = s.replaceAll("\t+", " ");
-//        s = s.replaceAll("\\s+", ",");
-//        s = s.replaceAll(",", "\t\t");
-        return s;
+        return null;
     }
 }

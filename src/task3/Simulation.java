@@ -1,7 +1,5 @@
 package task3;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
@@ -11,8 +9,9 @@ import java.util.concurrent.Callable;
  */
 
 public class Simulation implements Callable<String>{
-    public static int counter;      //static simulations counter
+    public static String TAG = "Simulation";
 
+    public static int counter;      //static simulations counter
     private int generationCount;
     private int geneLen;
     private int replicationSchema;
@@ -69,7 +68,7 @@ public class Simulation implements Callable<String>{
 //                printStatistics();
 //            }
         }catch (Exception e){
-            Main.printError("Cannot execute simulation " + e.toString());
+            Main.printError("Cannot execute simulation " + e.toString(), TAG);
         }
         Main.logger.info("Thread #" + Thread.currentThread().getId() + " finished");
 
