@@ -8,6 +8,7 @@ import task3.DNAPool;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DNAPoolTest {
@@ -83,5 +84,74 @@ public class DNAPoolTest {
 
         Assert.assertEquals(start1, end2);
         Assert.assertEquals(start2, end1);
+    }
+
+    @Test
+    public void getAvailableCitiesTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        int geneLen = 36;
+
+        DNAPool dnaPool = new DNAPool();
+        dnaPool.setGeneLen(geneLen);
+
+        Method getAvailableCities = dnaPool.getClass().getDeclaredMethod("getAvailableCities");
+        getAvailableCities.setAccessible(true);
+
+        ArrayList<Integer> cities = (ArrayList<Integer>) getAvailableCities.invoke(dnaPool);
+
+        Assert.assertEquals(geneLen, cities.size());
+    }
+
+    @Test
+    public void getNextPosTest_posMiddle_returnCorrect() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Integer [] arr = new Integer[10];
+
+        int pos  = 5;
+        int next = 6;
+        int prev = 4;
+
+        DNAPool dnaPool = new DNAPool();
+        Method getNextPos = DNAPool.class.getDeclaredMethod("getNextPos", Integer.TYPE, Integer [].class);
+        getNextPos.setAccessible(true);
+
+        int [] posArray = (int [])getNextPos.invoke(dnaPool, pos, arr);
+
+        Assert.assertEquals(posArray[0], next);
+        Assert.assertEquals(posArray[1], prev);
+    }
+
+    @Test
+    public void getNextPosTest_posEnd_returnCorrect() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Integer [] arr = new Integer[10];
+
+        int pos  = arr.length - 1;
+        int next = 0;
+        int prev = pos - 1;
+
+        DNAPool dnaPool = new DNAPool();
+        Method getNextPos = DNAPool.class.getDeclaredMethod("getNextPos", Integer.TYPE, Integer [].class);
+        getNextPos.setAccessible(true);
+
+        int [] posArray = (int [])getNextPos.invoke(dnaPool, pos, arr);
+
+        Assert.assertEquals(posArray[0], next);
+        Assert.assertEquals(posArray[1], prev);
+    }
+
+    @Test
+    public void getNextPosTest_posStart_returnCorrect() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Integer [] arr = new Integer[10];
+
+        int pos  = 0;
+        int next = 1;
+        int prev = arr.length - 1;
+
+        DNAPool dnaPool = new DNAPool();
+        Method getNextPos = DNAPool.class.getDeclaredMethod("getNextPos", Integer.TYPE, Integer [].class);
+        getNextPos.setAccessible(true);
+
+        int [] posArray = (int [])getNextPos.invoke(dnaPool, pos, arr);
+
+        Assert.assertEquals(posArray[0], next);
+        Assert.assertEquals(posArray[1], prev);
     }
 }

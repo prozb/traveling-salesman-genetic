@@ -17,8 +17,6 @@ import org.apache.log4j.*;
  * @version 4.0.1
  */
 public class Main {
-    private static String TAG = "Main";
-    private static HashMap<Vector<Integer>, Double> distances;
     private static int generationCount;
     private static int geneLen;
     private static int replicationSchema;
@@ -27,12 +25,14 @@ public class Main {
     private static int initRate;
     private static int runsNum;
     private static int pointsPos;
-    private static long startTime;
     private static float mutationRate;
     private static float recombinationRate;
     private static float lastPc;
+    private static long startTime;
     private static boolean protect;
 
+    private static String TAG = "Main";
+    private static HashMap<Vector<Integer>, Double> distances;
     private static Point [] points;
     private static String [] arguments;
     private static BufferedWriter writer;

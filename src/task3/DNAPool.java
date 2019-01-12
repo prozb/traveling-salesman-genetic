@@ -165,9 +165,8 @@ public class DNAPool {
         assert (int)(currentGeneration.length * recombinationRate) == crossOverPerf;
     }
 
-    private int getDistance(int city1, int city2){
-        // TODO: 09.01.19 implement distance calculation
-        return 0;
+    private double getDistance(int city1, int city2){
+        return Main.getDistanceBetweenTwoCities(city1, city2);
     }
 
     private int getRandomPos(){
@@ -176,9 +175,49 @@ public class DNAPool {
 
     private DNA greedyCrossOver(DNA dna1, DNA dna2){
         // TODO: 09.01.19 implement greedy cross over
-        return null;
+        ArrayList<Integer> availableCities = getAvailableCities();
+        Integer [] gene = new Integer[dna1.getGene().length];
+
+        int currentCity    = dna1.getGene()[0];
+        int currentPosDna1 = 0;
+        int currentPosDna2 = 0;
+
+        ArrayList<Integer> nextCities = new ArrayList<>();
+
+        for(int i = 0; i < gene.length; i++){
+
+        }
+
+        DNA newDna = new DNA(geneLen);
+        newDna.setGene(gene);
+
+        return newDna;
     }
 
+    //calculating next position according to current position
+    private int [] getNextPos(int pos, Integer [] array){
+        int [] next  = new int [2];
+        int posArray = 0;
+
+        //handle pos 0
+        if(pos == 0 && pos + 1 < array.length){
+            next[posArray++] = pos + 1;
+            next[posArray]   = array.length - 1;
+        //handle pos array.length - 1
+        }else if(pos == array.length - 1 && pos - 1 >= 0){
+            next[posArray++] = 0;
+            next[posArray]   = pos - 1;
+        //handle middle point
+        }else if (pos >= 0 && pos < array.length){
+            next[posArray++] = pos + 1;
+            next[posArray]   = pos - 1;
+        //incorrect points
+        }else {
+            next = null;
+        }
+
+        return next;
+    }
     private DNA[] alternativeCrossOver(DNA dna1, DNA dna2, Integer point1, Integer point2){
         this.alternativeMap.clear();
         this.alternativeMap1.clear();
@@ -222,7 +261,6 @@ public class DNAPool {
     }
 
     public void processMutation(){
-        // TODO: 09.01.19 change mutation method
         setBestGene();
 
         int mutationCount     = (int) (mutationRate * geneLen * generationLen) + 1;
@@ -362,5 +400,17 @@ public class DNAPool {
             Optional<DNA> bestGene = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::isBest));
             bestGene.ifPresent(DNA::unsetBest);
         }
+    }
+
+    public void setGeneLen(int geneLen){
+        this.geneLen = geneLen;
+    }
+
+    private ArrayList<Integer> getAvailableCities(){
+        ArrayList <Integer> cities = new ArrayList<>();
+        for(int i = 1; i <= geneLen; i++){
+            cities.add(i);
+        }
+        return cities;
     }
 }
