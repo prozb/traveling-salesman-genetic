@@ -2,6 +2,7 @@ package task3;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * @author Pavlo Rozbytskyi
@@ -170,52 +171,71 @@ public class DNAPool {
         return Main.getDistanceBetweenTwoCities(city1, city2);
     }
 
+    private int getRandomPos(int count){
+        return (int)(Math.random() * count);
+    }
+
     private int getRandomPos(){
-        return (int)(Math.random() * geneLen);
+        return getRandomPos(geneLen);
     }
 
     private DNA greedyCrossOver(DNA dna1, DNA dna2){
-        // TODO: 09.01.19 implement greedy cross over
+        //available cities for this gene
         ArrayList<Integer> availableCities = getAvailableCities();
-        Integer [] gene = new Integer[dna1.getGene().length];
+        //here are stored next cities to current city to choose from
+        ArrayList<Integer> nextCities      = new ArrayList<>();
         Integer [] citiesArray = null;
+        Integer [] gene    = new Integer[dna1.getGene().length];
+
+        Integer [] dna1Gene = dna1.getGene();
+        Integer [] dna2Gene = dna2.getGene();
 
         int currentCity    = dna1.getGene()[0];
         int currentPosDna1 = 0;
         int currentPosDna2 = 0;
 
-        ArrayList<Integer> nextCities = new ArrayList<>();
-        int [] next;
+        currentPosDna2 = Arrays.asList(dna2Gene).indexOf(currentCity);
+        //removing first city from available
+        availableCities.removeAll(Collections.singleton(currentCity));
+        int [] next1;
+        int [] next2;
 
-        for(int i = 0; i < gene.length; i++){
-            citiesArray    = availableCities.toArray(new Integer[availableCities.size()]);
-            currentPosDna2 = dna2.getGene()[currentPosDna2];
-
-            next = getNextPos(currentCity, gene);
-
+        for(int i = 0; i < gene.length; i++) {
+            //adding current city to new dna
+            gene[i] = currentCity;
+            if(i == gene.length - 1)
+                break;
+            nextCities.clear();
+            //getting 2 next cities from dna1
+            next1 = getNextPos(currentPosDna1, gene);
+            next2 = getNextPos(currentPosDna2, gene);
             //adding all cities to next cities array list if they are available
-            if(availableCities.contains(next[0]))
-                nextCities.add(next[0]);
-            if(availableCities.contains(next[1]))
-                nextCities.add(next[1]);
-            if(availableCities.contains(currentPosDna2))
-                nextCities.add(currentPosDna2);
-
+            if (availableCities.contains(dna1Gene[next1[0]]))
+                nextCities.add(dna1Gene[next1[0]]); //do not add already inserted cities
+            if (availableCities.contains(dna1Gene[next1[1]]) && !nextCities.contains(dna1Gene[next1[1]]))
+                nextCities.add(dna1Gene[next1[1]]);
+            if (availableCities.contains(dna2Gene[next2[0]]) && !nextCities.contains(dna2Gene[next2[0]]))
+                nextCities.add(dna2Gene[next2[0]]);
+            if (availableCities.contains(dna2Gene[next2[1]]) && !nextCities.contains(dna2Gene[next2[1]]))
+                nextCities.add(dna2Gene[next2[1]]);
+            //converting next cities array list into array for getCityWithLowestDistance method
+            citiesArray = nextCities.toArray(new Integer[nextCities.size()]);
             //get city with lowest distance to current city
             int nextCity = getCityWithLowestDistance(citiesArray, currentCity);
 
-            if(nextCity == next[0]){
-
-            }else if(nextCity == next[1]){
-
-            }else if(nextCity == currentPosDna2){
-                currentPosDna2++;
-            }else if(nextCity == -1){
-                //get random city
+            if (nextCity == -1) {
+                //choosing random city from available
+                int pos = getRandomPos(availableCities.size());
+                nextCity = availableCities.get(pos);
             }
-            availableCities.remove(nextCity);
-        }
+            currentCity = nextCity;
 
+            currentPosDna1 = Arrays.asList(dna1Gene).indexOf(nextCity);
+            currentPosDna2 = Arrays.asList(dna2Gene).indexOf(nextCity);
+
+            availableCities.removeAll(Collections.singleton(currentCity));
+        }
+        gene[gene.length - 1] = currentCity;
         DNA newDna = new DNA(geneLen);
         newDna.setGene(gene);
 

@@ -1,6 +1,7 @@
 package test;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import task3.DNA;
 import task3.DNAPool;
@@ -253,5 +254,67 @@ public class DNAPoolTest {
         int expected = (int)newCityPos.invoke(dnaPool, arr, pos, false);
 
         Assert.assertEquals(expected, nextPos);
+    }
+    @Ignore
+    @Test
+    public void greedyCrossOverTest_correctDNAs() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        int length = 6;
+        DNA dna1   = new DNA(length);
+        DNA dna2   = new DNA(length);
+
+        Integer [] gene1 = {5,2,4,3,1,6};
+        Integer [] gene2 = {2,3,4,5,6,1};
+        Integer [] gene  = {5,2,3,1,6,4};
+
+        dna1.setGene(gene1);
+        dna2.setGene(gene2);
+
+        HashMap<Vector<Integer>, Double> distances = new HashMap<>();
+        Vector<Integer> vector = new Vector<>();
+        vector.add(5);
+        vector.add(6);
+        distances.put(vector, 100d);
+        vector = new Vector<>();
+        vector.add(5);
+        vector.add(2);
+        distances.put(vector, 5d);
+        vector = new Vector<>();
+        vector.add(2);
+        vector.add(4);
+        distances.put(vector, 100d);
+        vector = new Vector<>();
+        vector.add(2);
+        vector.add(3);
+        distances.put(vector, 5d);
+        vector = new Vector<>();
+        vector.add(3);
+        vector.add(4);
+        distances.put(vector, 100d);
+        vector = new Vector<>();
+        vector.add(3);
+        vector.add(1);
+        distances.put(vector, 5d);
+        vector = new Vector<>();
+        vector.add(1);
+        vector.add(2);
+        distances.put(vector, 100d);
+        vector = new Vector<>();
+        vector.add(1);
+        vector.add(6);
+        distances.put(vector, 5d);
+        vector = new Vector<>();
+        vector.add(1);
+        vector.add(4);
+        distances.put(vector, 5d);
+
+        Main.setDistances(distances);
+
+        Method greedyCrossOver = DNAPool.class.getDeclaredMethod("greedyCrossOver", DNA.class, DNA.class);
+        greedyCrossOver.setAccessible(true);
+        DNAPool dnaPool = new DNAPool();
+        dnaPool.setGeneLen(length);
+        DNA dna = (DNA) greedyCrossOver.invoke(dnaPool, dna1, dna2);
+
+        Assert.assertArrayEquals(dna.getGene(), gene);
     }
 }
