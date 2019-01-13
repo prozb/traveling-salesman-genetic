@@ -8,8 +8,6 @@ import java.util.*;
  */
 public class DNA {
     private int len;
-    private double ps;      // probability to be chosen
-    private double psCum;   // cumulated probability
     private double fitness;
     private Integer [] gene;
     private boolean best;
@@ -19,7 +17,6 @@ public class DNA {
         this.len     = len;
         this.fitness = 0;
         initGene();
-        calcFitness();
     }
 
     public void calcFitness(){
@@ -74,7 +71,7 @@ public class DNA {
     public void setGene(Integer [] gene){
         this.gene = gene;
 
-        calcFitness();
+//        calcFitness();
     }
 
     public Integer[] getGene() {
@@ -82,38 +79,19 @@ public class DNA {
     }
 
     public double getFitness() {
-        calcFitness();
-
         return fitness;
+    }
+
+    /**
+     * fitness setter
+     * @param fitness new fitness
+     */
+    public void setFitness(double fitness){
+        this.fitness = fitness;
     }
 
     @Override
     public String toString() {
         return Arrays.toString(gene) + "\n";
-    }
-
-    public void calcProbability(int r, int n){
-        this.ps = ((2 - Constants.S) / n) + (2.0f * r * (Constants.S - 1)) / (n * (n - 1));
-    }
-
-    public double getPs(){
-        return ps;
-    }
-
-    public void calcCumulProbability(double prevPs){
-        psCum = prevPs + ps;
-    }
-
-    public double getPsCum(){
-        return psCum;
-    }
-
-    public void clearPs(){
-        ps = 0;
-        psCum = 0;
-    }
-
-    public void printRank(){
-        System.out.println("ps: " + ps + " psCum: " + psCum);
     }
 }

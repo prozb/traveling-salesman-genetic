@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
 // figure out maximal and minimal fitness
 public class DNAPool {
     private static String TAG = "DNAPool";
+
     private HashMap<Integer, Integer> alternativeMap;
     private HashMap<Integer, Integer> alternativeMap1;
     private DNA[] currentGeneration;
@@ -341,7 +342,7 @@ public class DNAPool {
     }
 
     public void sortGeneration(){
-        Arrays.sort(currentGeneration, Comparator.comparing(DNA::getFitness).reversed());
+        Arrays.sort(currentGeneration, Comparator.comparing(DNA::getFitness));
     }
 
     public void processMutation(){
@@ -400,10 +401,10 @@ public class DNAPool {
     }
 
     private void replicationSchemaOne(){
-        DNA[] bestDNAS = getBestGenes();
+        DNA[] bestDNAS = getBestTwoGenes();
 
         for(int i = 0; i < nextGeneration.length / 2; i++){
-            nextGeneration[i] = bestDNAS[getRandomPos(1)];
+            nextGeneration[i] = bestDNAS[getRandomPos(2)];
         }
 
         for(int i = nextGeneration.length / 2; i < nextGeneration.length; i++){
@@ -420,10 +421,23 @@ public class DNAPool {
         return bestPos;
     }
 
-    public DNA[] getBestGenes(){
+    /**
+     * selecting best two genes from the generation
+     * @return returns two genes
+     */
+    public DNA[] getBestTwoGenes(){
         int selectCount = 2;
 
-        return Arrays.copyOfRange(currentGeneration, currentGeneration.length - selectCount, currentGeneration.length);
+        DNA [] dnas = new DNA[selectCount];
+        dnas[0]     = currentGeneration[0];
+        //find next best gene not equal to first
+        for(int i = 1; i < currentGeneration.length; i++){
+            if(currentGeneration[i].getFitness() != dnas[0].getFitness()){
+                dnas[1] = currentGeneration[i];
+                break;
+            }
+        }
+        return dnas;
     }
 
     public int getGenerationsCount(){
@@ -484,5 +498,13 @@ public class DNAPool {
             cities.add(i);
         }
         return cities;
+    }
+
+    /**
+     * current generation setters
+     * @param generation generation to set
+     */
+    public void setCurrentGeneration(DNA [] generation){
+        this.currentGeneration = generation;
     }
 }

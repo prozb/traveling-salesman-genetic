@@ -10,9 +10,7 @@ import task3.Main;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.*;
 
 public class DNAPoolTest {
     @Test
@@ -316,5 +314,28 @@ public class DNAPoolTest {
         DNA dna = (DNA) greedyCrossOver.invoke(dnaPool, dna1, dna2);
 
         Assert.assertArrayEquals(dna.getGene(), gene);
+    }
+
+    @Test
+    public void getBestTwoGenesTest(){
+        int genelen  = 10;
+        DNAPool pool = new DNAPool();
+        DNA [] generation = new DNA [10];
+
+        for(int i = 0; i < generation.length; i++){
+            generation[i] = new DNA(genelen);
+            generation[i].setFitness(generation.length - i);
+        }
+        pool.setCurrentGeneration(generation);
+        double maxFitness = generation[0].getFitness();
+
+        generation[0].setFitness(maxFitness * genelen);
+        generation[1].setFitness(maxFitness * genelen);
+        generation[2].setFitness(maxFitness);
+
+        DNA [] twoGenes = pool.getBestTwoGenes();
+
+        Assert.assertEquals(twoGenes[0].getFitness(), generation[0].getFitness(), 0.00001);
+        Assert.assertEquals(twoGenes[1].getFitness(), generation[2].getFitness(), 0.00001);
     }
 }
