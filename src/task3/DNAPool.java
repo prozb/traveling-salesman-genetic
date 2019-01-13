@@ -77,10 +77,6 @@ public class DNAPool {
     private void calcMaxFitnessOfGeneration(){
         Optional<DNA> dnaMaxFitness = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::getFitness));
         dnaMaxFitness.ifPresent(DNA -> maxFitness = DNA.getFitness());
-
-        if(maxFitness == geneLen) {
-            finished = true;
-        }
     }
 
     /**
@@ -89,6 +85,10 @@ public class DNAPool {
     private void calcMinFitnessOfGeneration(){
         Optional<DNA> dnaMinFitness = Arrays.stream(currentGeneration).min(Comparator.comparing(DNA::getFitness));
         dnaMinFitness.ifPresent(DNA -> minFitness = DNA.getFitness());
+
+        if(minFitness <= geneLen){
+            finished = true;
+        }
     }
 
     public void switchToNextGeneration(){
@@ -154,7 +154,7 @@ public class DNAPool {
                     }
                     break;
                     default: {
-                        Main.printError("Chose cross over schema",TAG);
+                        Main.printError("Choose cross over schema",TAG);
                     }
                 }
 
@@ -165,8 +165,9 @@ public class DNAPool {
 
         //fill left genes with random genes
         for(int i = nextGenPos; i < nextGeneration.length; i++){
-            nextGeneration[i] = currentGeneration[getRandomPos()];
+            nextGeneration[i] = currentGeneration[getRandomPos(currentGeneration.length - 1)];
         }
+
         currentGeneration = nextGeneration;
         assert (int)(currentGeneration.length * recombinationRate) == crossOverPerf;
     }
@@ -404,11 +405,11 @@ public class DNAPool {
         DNA[] bestDNAS = getBestTwoGenes();
 
         for(int i = 0; i < nextGeneration.length / 2; i++){
-            nextGeneration[i] = bestDNAS[getRandomPos(2)];
+            nextGeneration[i] = bestDNAS[getRandomPos(1)];
         }
 
         for(int i = nextGeneration.length / 2; i < nextGeneration.length; i++){
-            nextGeneration[i] = currentGeneration[getRandomPos(generationsCount)];
+            nextGeneration[i] = currentGeneration[getRandomPos(currentGeneration.length - 1)];
         }
     }
 
