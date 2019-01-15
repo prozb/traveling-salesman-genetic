@@ -17,6 +17,7 @@ public class DNA {
         this.len     = len;
         this.fitness = 0;
         initGene();
+//        calcFitness();
     }
 
     public void calcFitness(){
@@ -31,6 +32,7 @@ public class DNA {
 
             fitness +=  Main.getDistanceBetweenTwoCities(x, y);
         }
+        System.out.println();
     }
 
     /**

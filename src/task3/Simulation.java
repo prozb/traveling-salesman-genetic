@@ -126,13 +126,21 @@ public class Simulation implements Callable<String>{
         DNAPool pool = new DNAPool(generationCount, geneLen, initRate, mutationRate,
                                     replicationSchema, crossOverSchema, recombinationRate, protect);
         while(!pool.isFinished() && runsCount > 0){
+            pool.calculateFitness();
+            pool.calcMinFitnessOfGeneration();
             pool.processCrossOver();
             pool.processMutation();
+            pool.calculateFitness();
+            pool.calcMinFitnessOfGeneration();
             pool.sortGeneration();
             pool.processReplication();
             pool.switchToNextGeneration();
+            pool.calculateFitness();
+
             runsCount--;
         }
+        Main.logger.info("generation: " + (pool.getGenerationsCount() - 1) + " min fitness general: "
+                + pool.getMinFitnessGeneral());
         push(pool.getGenerationsCount() - 1);
     }
 

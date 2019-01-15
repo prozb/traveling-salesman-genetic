@@ -253,7 +253,7 @@ public class DNAPoolTest {
 
         Assert.assertEquals(expected, nextPos);
     }
-    @Ignore
+//    @Ignore
     @Test
     public void greedyCrossOverTest_correctDNAs() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         int length = 6;

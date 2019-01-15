@@ -253,6 +253,9 @@ public class Main {
         Vector<Integer> cityPair2 = new Vector<>();
 
         for(int i = 1; i <= citiesCount; i++){
+            if(i == citiesCount - 1){
+                System.out.println();
+            }
             for(int j = i + 1; j <= citiesCount; j++){
                 cityPair1.clear();
                 cityPair2.clear();

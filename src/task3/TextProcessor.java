@@ -41,6 +41,8 @@ public class TextProcessor {
                 i++;
             }
 
+//            System.out.println(tspCities.length * tspCities.length);
+//            Sy?stem.out.println(tspCities.length);
             return tspCities;
        } catch (Exception e) {
             Main.printError(e.getMessage(), TAG);

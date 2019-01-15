@@ -32,6 +32,8 @@ public class DNAPool {
     private boolean protect;
     private int [] cities;
 
+    private double minFitnessGeneral; //will be printed at the end of the simulation
+
     public DNAPool(){
         this.alternativeMap    = new HashMap<>();
         this.alternativeMap1    = new HashMap<>();
@@ -43,7 +45,10 @@ public class DNAPool {
         this.crossOverSchema   = crossOverSchema;
         this.recombinationRate = recombinationRate;
         this.alternativeMap    = new HashMap<>();
+        this.alternativeMap1   = new HashMap<>();
+        this.minFitnessGeneral = Double.MAX_VALUE;
 
+        this.finished      = false;
         this.mutationRate  = mutationRate;
         this.generationLen = generationLen;
         // protecting best gene from mutation and cross over
@@ -63,12 +68,9 @@ public class DNAPool {
         this.geneLen           = geneLen;
         this.generationsCount  = 0;
 
-        for(int i = 0; i < currentGeneration.length; i++){
+        for(int i = 0; i < currentGeneration.length; i++) {
             currentGeneration[i] = new DNA(geneLen);
         }
-
-        calcMaxFitnessOfGeneration();
-        calcMinFitnessOfGeneration();
     }
 
     /**
@@ -82,21 +84,30 @@ public class DNAPool {
     /**
      * calculating min fitness of gen
      */
-    private void calcMinFitnessOfGeneration(){
+    public void calcMinFitnessOfGeneration(){
         Optional<DNA> dnaMinFitness = Arrays.stream(currentGeneration).min(Comparator.comparing(DNA::getFitness));
         dnaMinFitness.ifPresent(DNA -> minFitness = DNA.getFitness());
 
-        if(minFitness <= geneLen){
+        if(minFitnessGeneral <= 50){
             finished = true;
+            minFitnessGeneral = minFitness;
         }
+
+        if(minFitness < minFitnessGeneral)
+            minFitnessGeneral = minFitness;
     }
 
+    public double getMinFitnessGeneral(){
+        return minFitnessGeneral;
+    }
+
+    public void calculateFitness(){
+        Arrays.stream(currentGeneration).forEach(DNA::calcFitness);
+    }
     public void switchToNextGeneration(){
         calcMinFitnessOfGeneration();
         calcMaxFitnessOfGeneration();
         generationsCount++;
-
-        currentGeneration = nextGeneration;
     }
 
     // created for testing reasons
@@ -104,6 +115,10 @@ public class DNAPool {
         setBestGene();
         crossOverSchema();
         unsetBestGene();
+
+        currentGeneration = nextGeneration;
+
+        calculateFitness();
         calcMinFitnessOfGeneration();
         calcMaxFitnessOfGeneration();
     }
@@ -133,7 +148,7 @@ public class DNAPool {
 
                 switch (crossOverSchema){
                     case 3: {
-                        new1 = greedyCrossOver(dna1, dna2);
+                        new1 = greedyCrossOver(currentGeneration[firstGenePos], currentGeneration[secondGenePos]);
 
                         nextGeneration[nextGenPos++] = new1;
                     }
@@ -200,10 +215,12 @@ public class DNAPool {
         int currentPosDna2 = 0;
 
         currentPosDna2 = Arrays.asList(dna2Gene).indexOf(currentCity);
+        currentPosDna1 = Arrays.asList(dna1Gene).indexOf(currentCity);
+
         //removing first city from available
         availableCities.removeAll(Collections.singleton(currentCity));
-        int [] next1;
-        int [] next2;
+        int next1;
+        int next2;
 
         for(int i = 0; i < gene.length; i++) {
             //adding current city to new dna
@@ -211,18 +228,18 @@ public class DNAPool {
             if(i == gene.length - 1)
                 break;
             nextCities.clear();
-            //getting 2 next cities from dna1
-            next1 = getNextPos(currentPosDna1, gene);
-            next2 = getNextPos(currentPosDna2, gene);
+            //getting 2 next citiy from dna1
+            next1 = nextCityPos(gene, currentPosDna1);
+            next2 = nextCityPos(gene, currentPosDna2);
+
             //adding all cities to next cities array list if they are available
-            if (availableCities.contains(dna1Gene[next1[0]]))
-                nextCities.add(dna1Gene[next1[0]]); //do not add already inserted cities
-            if (availableCities.contains(dna1Gene[next1[1]]) && !nextCities.contains(dna1Gene[next1[1]]))
-                nextCities.add(dna1Gene[next1[1]]);
-            if (availableCities.contains(dna2Gene[next2[0]]) && !nextCities.contains(dna2Gene[next2[0]]))
-                nextCities.add(dna2Gene[next2[0]]);
-            if (availableCities.contains(dna2Gene[next2[1]]) && !nextCities.contains(dna2Gene[next2[1]]))
-                nextCities.add(dna2Gene[next2[1]]);
+            if (next1 != -1 && availableCities.contains(dna1Gene[next1])){
+                nextCities.add(dna1Gene[next1]); //do not add already inserted cities
+            }else if (next2 != -1 && availableCities.contains(dna2Gene[next2])){
+                nextCities.add(dna2Gene[next2]);
+            }else if(next1 == -1 && next2 == -1){
+
+            }
             //converting next cities array list into array for getCityWithLowestDistance method
             citiesArray = nextCities.toArray(new Integer[nextCities.size()]);
             //get city with lowest distance to current city
@@ -248,17 +265,11 @@ public class DNAPool {
     }
 
     //calculating next position in first dna for greedy crossover
-    private int newCityPos(Integer[] cities, int pos, boolean right){
+    private int nextCityPos(Integer[] cities, int currentPos){
         int nextPos = -1;
 
-        if(right && pos + 1 < cities.length && pos >= 0){
-            nextPos = pos + 1;
-        }if(right && pos == cities.length - 1 && pos >= 0 && pos < cities.length){
-            nextPos = 0;
-        }else if (!right && pos - 1 >= 0 && pos < cities.length){
-            nextPos = pos - 1;
-        }else if(!right && pos == 0 && pos < cities.length){
-            nextPos = cities.length - 1;
+        if(currentPos + 1 < cities.length && currentPos > -1){
+            nextPos = currentPos + 1;
         }
 
         return nextPos;
@@ -311,7 +322,7 @@ public class DNAPool {
         Integer [] gene1     = dna1.getGene();
         Integer [] gene2     = dna2.getGene();
 
-        for(int i = --point1; i < point2; i++){
+        for(int i = point1; i < point2; i++){
             alternativeMap.put(gene1[i], gene2[i]);
             alternativeMap1.put(gene2[i], gene1[i]);
         }
@@ -405,7 +416,7 @@ public class DNAPool {
         DNA[] bestDNAS = getBestTwoGenes();
 
         for(int i = 0; i < nextGeneration.length / 2; i++){
-            nextGeneration[i] = bestDNAS[getRandomPos(1)];
+            nextGeneration[i] = bestDNAS[getRandomPos(2)];
         }
 
         for(int i = nextGeneration.length / 2; i < nextGeneration.length; i++){
@@ -458,10 +469,7 @@ public class DNAPool {
     }
 
     public boolean isFinished(){
-        if(minFitness <= geneLen){
-            return true;
-        }
-        return false;
+        return finished;
     }
 
     public void printInfo(){
