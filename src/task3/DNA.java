@@ -32,7 +32,6 @@ public class DNA {
 
             fitness +=  Main.getDistanceBetweenTwoCities(x, y);
         }
-        System.out.println();
     }
 
     /**
