@@ -148,7 +148,7 @@ public class DNAPool {
 
                 switch (crossOverSchema){
                     case 3: {
-                        new1 = greedyCrossOver(currentGeneration[firstGenePos], currentGeneration[secondGenePos]);
+                        new1 = greedyCrossOver2(currentGeneration[firstGenePos], currentGeneration[secondGenePos]);
 
                         nextGeneration[nextGenPos++] = new1;
                     }
@@ -199,122 +199,74 @@ public class DNAPool {
         return getRandomPos(geneLen);
     }
 
-    private DNA greedyCrossOver(DNA dna1, DNA dna2){
+    private DNA greedyCrossOver2(DNA dna1, DNA dna2){
         //available cities for this gene
         ArrayList<Integer> availableCities = getAvailableCities();
-        //here are stored next cities to current city to choose from
-        ArrayList<Integer> nextCities      = new ArrayList<>();
-        Integer [] citiesArray = null;
-        Integer [] gene    = new Integer[dna1.getGene().length];
 
-        Integer [] dna1Gene = dna1.getGene();
-        Integer [] dna2Gene = dna2.getGene();
+        Integer [] gene1 = dna1.getGene();
+        Integer [] gene2 = dna2.getGene();
+        //save new cities in this array
+        Integer [] geneN = new Integer[gene1.length];
 
-        int currentCity    = dna1.getGene()[0];
-        int currentPosDna1 = 0;
-        int currentPosDna2 = 0;
+        //getting random city from first path
+        int currentCity = gene1[0];
+        availableCities.remove(Integer.valueOf(currentCity));
+        //removing current city from available cities
+        geneN[0] = currentCity;
 
-        currentPosDna2 = Arrays.asList(dna2Gene).indexOf(currentCity);
-        currentPosDna1 = Arrays.asList(dna1Gene).indexOf(currentCity);
+        for(int i = 1; i < geneN.length; i++){
+            int posCurrentInGene1 = Arrays.asList(gene1).indexOf(currentCity);
+            int posCurrentInGene2 = Arrays.asList(gene2).indexOf(currentCity);
 
-        //removing first city from available
-        availableCities.removeAll(Collections.singleton(currentCity));
-        int next1;
-        int next2;
+            int nextPosGene1 = getNextPosition(geneLen, posCurrentInGene1);
+            int nextPosGene2 = getNextPosition(geneLen, posCurrentInGene2);
 
-        for(int i = 0; i < gene.length; i++) {
-            //adding current city to new dna
-            gene[i] = currentCity;
-            if(i == gene.length - 1)
-                break;
-            nextCities.clear();
-            //getting 2 next citiy from dna1
-            next1 = nextCityPos(gene, currentPosDna1);
-            next2 = nextCityPos(gene, currentPosDna2);
-
-            //adding all cities to next cities array list if they are available
-            if (next1 != -1 && availableCities.contains(dna1Gene[next1])){
-                nextCities.add(dna1Gene[next1]); //do not add already inserted cities
-            }else if (next2 != -1 && availableCities.contains(dna2Gene[next2])){
-                nextCities.add(dna2Gene[next2]);
-            }else if(next1 == -1 && next2 == -1){
-
+            if( availableCities.contains(gene1[nextPosGene1]) &&
+                availableCities.contains(gene2[nextPosGene2])){
+                currentCity = getCityWithLowestDistance1(currentCity, gene1[nextPosGene1], gene2[nextPosGene2]);
+            }else if(availableCities.contains(gene1[nextPosGene1])){
+                currentCity = gene1[nextPosGene1];
+            }else if(availableCities.contains(gene2[nextPosGene2])){
+                currentCity = gene2[nextPosGene2];
+            }else{
+                currentCity = availableCities.get(getRandomPos(availableCities.size()));
             }
-            //converting next cities array list into array for getCityWithLowestDistance method
-            citiesArray = nextCities.toArray(new Integer[nextCities.size()]);
-            //get city with lowest distance to current city
-            int nextCity = getCityWithLowestDistance(citiesArray, currentCity);
-
-            if (nextCity == -1) {
-                //choosing random city from available
-                int pos = getRandomPos(availableCities.size());
-                nextCity = availableCities.get(pos);
-            }
-            currentCity = nextCity;
-
-            currentPosDna1 = Arrays.asList(dna1Gene).indexOf(nextCity);
-            currentPosDna2 = Arrays.asList(dna2Gene).indexOf(nextCity);
-
-            availableCities.removeAll(Collections.singleton(currentCity));
+            availableCities.remove(Integer.valueOf(currentCity));
+            geneN[i] = currentCity;
         }
-        gene[gene.length - 1] = currentCity;
-        DNA newDna = new DNA(geneLen);
-        newDna.setGene(gene);
+        //new generated after crossover dna
+        DNA dnaNew = new DNA(gene1.length);
+        dnaNew.setGene(geneN);
 
-        return newDna;
+        return dnaNew;
     }
 
-    //calculating next position in first dna for greedy crossover
-    private int nextCityPos(Integer[] cities, int currentPos){
-        int nextPos = -1;
+    private int getCityWithLowestDistance1(int currentCity, int city1, int city2){
+        double cityCity1 = Main.getDistanceBetweenTwoCities(currentCity, city1);
+        double cityCity2 = Main.getDistanceBetweenTwoCities(currentCity, city2);
 
-        if(currentPos + 1 < cities.length && currentPos > -1){
-            nextPos = currentPos + 1;
-        }
-
-        return nextPos;
+        if(cityCity1 < cityCity2)
+            return city1;
+        else
+            return city2;
     }
-    //figuring out city with lowest distance to current city
-    private int getCityWithLowestDistance(Integer[] cities, int currentCity){
-        if(cities != null && cities.length > 0) {
-            int city = cities[0];
-            double dist = getDistance(currentCity, city);
 
-            for (int i = 1; i < cities.length; i++) {
-                double nextDist = getDistance(currentCity, cities[i]);
-                if (nextDist < dist){
-                    city = cities[i];
-                    dist = nextDist;
-                }
+    private int getNextPosition(int arrayLen, int currentPos){
+        int ret = 0;
+
+        if(currentPos > -1 && currentPos < arrayLen){
+            if(currentPos + 1 >= arrayLen){
+                ret = 0;
+            }else{
+                ret = currentPos + 1;
             }
-            return city;
-        }
-        return -1;
-    }
-    //calculating next position according to current position
-    private int [] getNextPos(int pos, Integer [] array){
-        int [] next  = new int [2];
-        int posArray = 0;
-
-        //handle pos 0
-        if(pos == 0 && pos + 1 < array.length){
-            next[posArray++] = pos + 1;
-            next[posArray]   = array.length - 1;
-        //handle pos array.length - 1
-        }else if(pos == array.length - 1 && pos - 1 >= 0){
-            next[posArray++] = 0;
-            next[posArray]   = pos - 1;
-        //handle middle point
-        }else if (pos >= 0 && pos < array.length){
-            next[posArray++] = pos + 1;
-            next[posArray]   = pos - 1;
-        //incorrect points
         }else {
-            next = null;
+            Main.printError("current position is out of bounds", TAG);
         }
 
-        return next;
+        return ret;
     }
+
     private DNA[] alternativeCrossOver(DNA dna1, DNA dna2, Integer point1, Integer point2){
         this.alternativeMap.clear();
         this.alternativeMap1.clear();

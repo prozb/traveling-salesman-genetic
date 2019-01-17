@@ -307,7 +307,7 @@ public class DNAPoolTest {
 
         Main.setDistances(distances);
 
-        Method greedyCrossOver = DNAPool.class.getDeclaredMethod("greedyCrossOver", DNA.class, DNA.class);
+        Method greedyCrossOver = DNAPool.class.getDeclaredMethod("greedyCrossOver2", DNA.class, DNA.class);
         greedyCrossOver.setAccessible(true);
         DNAPool dnaPool = new DNAPool();
         dnaPool.setGeneLen(length);
