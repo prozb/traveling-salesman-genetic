@@ -108,14 +108,18 @@ public class Simulation implements Callable<String>{
 
     //process runsNum simulations to calculate average
     private void startSimulation() {
-        int localRunsNum = runsNum;
-        int runsCounter  = 0;
-        while (localRunsNum > 0){
-            runSimulation();
-            Main.logger.debug("Thread $" + Thread.currentThread().getId()  + " simulation #" + posSimul +
-                              " run #" + runsCounter + " finished");
-            localRunsNum--;
-            runsCounter++;
+        try {
+            int localRunsNum = runsNum;
+            int runsCounter = 0;
+            while (localRunsNum > 0) {
+                runSimulation();
+                Main.logger.debug("Thread $" + Thread.currentThread().getId() + " simulation #" + posSimul +
+                        " run #" + runsCounter + " finished pm = " + point.getPm() + " pc = " + point.getPc());
+                localRunsNum--;
+                runsCounter++;
+            }
+        }catch (Exception e){
+            Main.logger.error(TAG, e);
         }
     }
 

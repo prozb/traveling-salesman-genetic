@@ -1,10 +1,5 @@
 package task3;
-
-import org.mockito.internal.util.collections.ArrayUtils;
-
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.stream.IntStream;
 
 /**
  * @author Pavlo Rozbytskyi
@@ -77,24 +72,32 @@ public class DNAPool {
      * calculating max fitness of gen
      */
     private void calcMaxFitnessOfGeneration(){
-        Optional<DNA> dnaMaxFitness = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::getFitness));
-        dnaMaxFitness.ifPresent(DNA -> maxFitness = DNA.getFitness());
+        try {
+            Optional<DNA> dnaMaxFitness = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::getFitness));
+            dnaMaxFitness.ifPresent(DNA -> maxFitness = DNA.getFitness());
+        }catch (Exception e){
+            Main.logger.info(TAG, e);
+        }
     }
 
     /**
      * calculating min fitness of gen
      */
-    public void calcMinFitnessOfGeneration(){
-        Optional<DNA> dnaMinFitness = Arrays.stream(currentGeneration).min(Comparator.comparing(DNA::getFitness));
-        dnaMinFitness.ifPresent(DNA -> minFitness = DNA.getFitness());
+    public void calcMinFitnessOfGeneration (){
+        try {
+            Optional<DNA> dnaMinFitness = Arrays.stream(currentGeneration).min(Comparator.comparing(DNA::getFitness));
+            dnaMinFitness.ifPresent(DNA -> minFitness = DNA.getFitness());
 
-        if(minFitnessGeneral <= 50){
-            finished = true;
-            minFitnessGeneral = minFitness;
+            if (minFitnessGeneral <= 42) {
+                finished = true;
+                minFitnessGeneral = minFitness;
+            }
+
+            if (minFitness < minFitnessGeneral)
+                minFitnessGeneral = minFitness;
+        }catch (Exception e){
+            Main.logger.info(TAG, e);
         }
-
-        if(minFitness < minFitnessGeneral)
-            minFitnessGeneral = minFitness;
     }
 
     public double getMinFitnessGeneral(){
@@ -102,6 +105,7 @@ public class DNAPool {
     }
 
     public void calculateFitness(){
+
         Arrays.stream(currentGeneration).forEach(DNA::calcFitness);
     }
     public void switchToNextGeneration(){
@@ -116,7 +120,9 @@ public class DNAPool {
         crossOverSchema();
         unsetBestGene();
 
-        currentGeneration = nextGeneration;
+        if(crossOverSchema == 3) {
+            currentGeneration = nextGeneration;
+        }
 
         calculateFitness();
         calcMinFitnessOfGeneration();
@@ -160,12 +166,15 @@ public class DNAPool {
                             firsRandPos = c;
                         }
 
-                        DNA [] dnas = alternativeCrossOver(dna1, dna2, firsRandPos, secRandPos);
+                        DNA [] dnas = alternativeCrossOver1(dna1, dna2, firsRandPos, secRandPos);
                         new1 = Objects.requireNonNull(dnas)[0];
                         new2 = Objects.requireNonNull(dnas[1]);
 
                         nextGeneration[nextGenPos++] = new1;
                         nextGeneration[nextGenPos++] = new2;
+
+                        crossOverCount--;
+                        crossOverPerf++;
                     }
                     break;
                     default: {
@@ -261,48 +270,49 @@ public class DNAPool {
                 ret = currentPos + 1;
             }
         }else {
-            Main.printError("current position is out of bounds", TAG);
+            Main.logger.error(TAG + " current pos is out of bounds");
         }
 
         return ret;
     }
 
-    private DNA[] alternativeCrossOver(DNA dna1, DNA dna2, Integer point1, Integer point2){
-        this.alternativeMap.clear();
-        this.alternativeMap1.clear();
+    public DNA[] alternativeCrossOver1(DNA dna1, DNA dna2, Integer point1, Integer point2){
+        HashMap<Integer, Integer> map1 = new HashMap<>();
+        HashMap<Integer, Integer> map2 = new HashMap<>();
 
-        Integer [] gene1     = dna1.getGene();
-        Integer [] gene2     = dna2.getGene();
+        Integer [] gene1 = dna1.getGene();
+        Integer [] gene2 = dna2.getGene();
 
-        for(int i = point1; i < point2; i++){
-            alternativeMap.put(gene1[i], gene2[i]);
-            alternativeMap1.put(gene2[i], gene1[i]);
+        int x = point1;
+        int y = point2;
+
+        if(point1 > point2){
+            x = point2;
+            y = point1;
+        }
+        for(int i = x; i <= y; i++){
+            map1.put(gene1[i], gene2[i]);
+            map2.put(gene2[i], gene1[i]);
         }
 
         for(int i = 0; i < gene1.length; i++){
-            if(alternativeMap.containsKey(gene1[i])){
-                gene1[i] = alternativeMap.get(gene1[i]);
-            }else if(alternativeMap1.containsKey(gene1[i])){
-                gene1[i] = alternativeMap1.get(gene1[i]);
+            if(map1.containsKey(gene1[i])){
+                gene1[i] = map1.get(gene1[i]);
+            }else if(map2.containsKey(gene1[i])){
+                gene1[i] = map2.get(gene1[i]);
             }
 
-            if(alternativeMap1.containsKey(gene2[i])){
-                gene2[i] = alternativeMap1.get(gene2[i]);
-            }else if(alternativeMap.containsKey(gene2[i])){
-                gene2[i] = alternativeMap.get(gene2[i]);
+            if(map2.containsKey(gene2[i])){
+                gene2[i] = map2.get(gene2[i]);
+            }else if(map1.containsKey(gene2[i])){
+                gene2[i] = map1.get(gene2[i]);
             }
         }
 
-        DNA [] dnas = new DNA[2];
-        DNA new1    = new DNA(dna1.getGene().length);
-        DNA new2    = new DNA(dna1.getGene().length);
+        dna1.setGene(gene1);
+        dna2.setGene(gene2);
 
-        new1.setGene(gene1);
-        new2.setGene(gene2);
-        dnas[0] = new1;
-        dnas[1] = new2;
-
-        return dnas;
+        return new DNA[] {dna1, dna2};
     }
 
     public void sortGeneration(){
@@ -356,12 +366,37 @@ public class DNAPool {
             case 1:
                 replicationSchemaOne();
                 break;
+            case 2:
+                replicationSchemaTwo();
             default:
                 throw new RuntimeException("please input replication schema");
         }
 
         calcMinFitnessOfGeneration();
         calcMaxFitnessOfGeneration();
+    }
+
+    private void replicationSchemaTwo(){
+        DNA [] dnas = getFiveBestGenes();
+
+        for(int i = 0; i < nextGeneration.length; i++){
+            nextGeneration[i] = dnas[getRandomPos(dnas.length)];
+        }
+    }
+
+    public DNA[] getFiveBestGenes(){
+        int selectCount = 5;
+        int posDnas     = 0;
+
+        DNA [] dnas = new DNA[selectCount];
+        dnas[posDnas]     = currentGeneration[0];
+        //find next best gene not equal to first
+        for(int i = 1; i < currentGeneration.length && posDnas < 4; i++){
+            if(currentGeneration[i].getFitness() != dnas[posDnas].getFitness()){
+                dnas[++posDnas] = currentGeneration[i];
+            }
+        }
+        return dnas;
     }
 
     private void replicationSchemaOne(){

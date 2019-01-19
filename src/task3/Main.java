@@ -107,7 +107,6 @@ public class Main {
             exportBufferToFile();
         }else{
             exportBufferToFile();
-//            logger.info("Average " + sBuilder.toString() + " generations to achieve max fitness");
         }
         logger.info("Time: complete program duration " + TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime) + "s");
         logger.info("Program execution finished at " + sdfDate.format(new Date()));

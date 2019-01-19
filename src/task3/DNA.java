@@ -17,7 +17,6 @@ public class DNA {
         this.len     = len;
         this.fitness = 0;
         initGene();
-//        calcFitness();
     }
 
     public void calcFitness(){
@@ -26,7 +25,7 @@ public class DNA {
         int x = 0;
         int y = 0;
 
-        for(int i = 0; i < gene.length - 1; i++){
+        for(int i = 0; i < gene.length - 2; i++){
             x = gene[i];
             y = gene[i + 1];
 

@@ -16,7 +16,7 @@ public class DNAPoolTest {
     @Test
     public void alternativeCrossOverTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         DNAPool dnaPool = new DNAPool();
-        Method method   = dnaPool.getClass().getDeclaredMethod("alternativeCrossOver", DNA.class, DNA.class,
+        Method method   = dnaPool.getClass().getDeclaredMethod("alternativeCrossOver1", DNA.class, DNA.class,
                                                                                      Integer.class, Integer.class);
         method.setAccessible(true);
 
@@ -337,5 +337,25 @@ public class DNAPoolTest {
 
         Assert.assertEquals(twoGenes[0].getFitness(), generation[0].getFitness(), 0.00001);
         Assert.assertEquals(twoGenes[1].getFitness(), generation[2].getFitness(), 0.00001);
+    }
+
+    @Test
+    public void alternativeCrossOverTest2(){
+        Integer [] gene1 = new Integer[] {4,1,3,2,0,5};
+        Integer [] gene2 = new Integer[] {1,2,3,4,5,0};
+
+        DNA dna1 = new DNA(6);
+        DNA dna2 = new DNA(6);
+
+        dna1.setGene(gene1);
+        dna2.setGene(gene2);
+
+        DNA [] dnas = new DNAPool().alternativeCrossOver1(dna1, dna2, 2, 4);
+
+        Integer [] geneN1 = {2,1,3,4,5,0};
+        Integer [] geneN2 = {1,4,3,2,0,5};
+
+        Assert.assertArrayEquals(geneN1, dnas[0].getGene());
+        Assert.assertArrayEquals(geneN2, dnas[1].getGene());
     }
 }
