@@ -20,10 +20,15 @@ public class Constants {
 //    public static final int THREADS_NUM  = 1;
     public static final int THREADS_NUM  = 4;      //how much threads will be execute calculation (best way is when
                                                    //threads num equals count of physical CPUs)
-
     public static final String DATE_PATTERN      = "dd.MM.yyyy hh:mm:ss";
     public static final String DATE_FILE_PATTERN = "dd_MM_yyyy_hh_mm_ss";
 
     public static final boolean GRAPH_SIMULATION = true;
 //    public static final boolean GRAPH_SIMULATION = false;
+    public static final boolean TSP_RANDOM = false;
+    public static final int TSP_SIMULATIONS_COUNT = 100;
+
+    public static final int CITY_COUNT = 200;
+    public static final int GRID_SIZE = 100;
+    public static final int GENERATIONS_NUM = 2000;
 }

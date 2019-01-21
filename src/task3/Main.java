@@ -71,7 +71,8 @@ public class Main {
 
         // TODO: 12.01.19
         TextProcessor processor = new TextProcessor();
-        int [][] map = processor.readFileTSP("file.64");
+//        int [][] map = processor.readFileTSP("file1.64");
+        int [][] map = processor.readFileTSP("file1.64");
         calculateDistances(map, geneLen);
         // TODO: 12.01.19
 
@@ -370,4 +371,6 @@ public class Main {
     public static void setDistances(HashMap<Vector<Integer>, Double> _distances){
         distances = _distances;
     }
+
+
 }

@@ -1,5 +1,7 @@
 package task3;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
@@ -26,8 +28,11 @@ public class Simulation implements Callable<String>{
     private boolean protect;        //protect best schema
     private boolean isGraph;        //if need to export to file
 
+    private double da; // distance approximated
     private int [] statArr;
+    private double [] distArr;
     private int resPosition;
+    private int distPos;
     private StringBuilder sb;
     private Point point;
 
@@ -54,7 +59,9 @@ public class Simulation implements Callable<String>{
         this.protect  = protect;
         this.geneLen  = geneLen;
         this.statArr  = new int[runsNum];
+        this.distArr  = new double[Constants.GENERATIONS_NUM];
         this.sb       = new StringBuilder();
+        this.da       = 0.765 * Math.sqrt( (Constants.CITY_COUNT + 1) * Constants.GRID_SIZE * Constants.GRID_SIZE);
 
         counter++;
     }
@@ -84,12 +91,28 @@ public class Simulation implements Callable<String>{
         mutationRate      = point.getPm();
         recombinationRate = point.getPc();
 
-        startSimulation();
+        if(Constants.TSP_RANDOM) {
+//            for(int i = 0; i < Constants.TSP_SIMULATIONS_COUNT; i++){
+            startSimulation();
+//                double df = distArr[distPos - 1];
+            for (int i = 0; i < distArr.length; i++) {
+                exportToBuffer(distArr[i], da);
+            }
+        }else{
+            startSimulation();
+            genCount = calcStatistics();
+            exportToBuffer(mutationRate, recombinationRate, genCount);
+        }
 
-        genCount = calcStatistics();
-        exportToBuffer(mutationRate, recombinationRate, genCount);
         Main.logger.debug("===> Thread $" + Thread.currentThread().getId() + " simulation #" + posSimul + " finished");
 
+    }
+
+    private void exportToBuffer(double df, double da) {
+        sb.append(df);
+        sb.append("\t\t");
+        sb.append(da);
+        sb.append("\t\n");
     }
 
     private void exportToBuffer(float pc, float pm, float averCount){
@@ -117,6 +140,9 @@ public class Simulation implements Callable<String>{
                         " run #" + runsCounter + " finished pm = " + point.getPm() + " pc = " + point.getPc());
                 localRunsNum--;
                 runsCounter++;
+
+                if(Constants.TSP_RANDOM)
+                    break;
             }
         }catch (Exception e){
             Main.logger.error(TAG, e);
@@ -141,6 +167,11 @@ public class Simulation implements Callable<String>{
             pool.switchToNextGeneration();
             pool.calculateFitness();
 
+            if(Constants.TSP_RANDOM) {
+                pushDist(pool.getMinFitnessGeneral());
+            }
+            if(runsCount == 100 || runsCount == 300 || runsCount == 700 || runsCount == 1500 || runsCount == 2000)
+                Main.logger.info("runs count = " + runsCount);
             runsCount--;
         }
         Main.logger.info("generation: " + (pool.getGenerationsCount() - 1) + " min fitness general: "
@@ -161,6 +192,10 @@ public class Simulation implements Callable<String>{
     // pushes result of the generation into statistics array
     private void push(int res){
         statArr[resPosition++] = res;
+    }
+
+    private void pushDist(double dist){
+        distArr[distPos++] = dist;
     }
 
     private void clear(){

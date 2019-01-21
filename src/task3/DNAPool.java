@@ -88,7 +88,7 @@ public class DNAPool {
             Optional<DNA> dnaMinFitness = Arrays.stream(currentGeneration).min(Comparator.comparing(DNA::getFitness));
             dnaMinFitness.ifPresent(DNA -> minFitness = DNA.getFitness());
 
-            if (minFitnessGeneral <= 42) {
+            if (minFitnessGeneral <= 36) { //find minimum fitness
                 finished = true;
                 minFitnessGeneral = minFitness;
             }
@@ -105,8 +105,14 @@ public class DNAPool {
     }
 
     public void calculateFitness(){
+        for(int i = 0; i < currentGeneration.length; i++){
+            if(currentGeneration[i] == null){
+                System.out.println();
+            }
+            currentGeneration[i].calcFitness();
 
-        Arrays.stream(currentGeneration).forEach(DNA::calcFitness);
+        }
+//        Arrays.stream(currentGeneration).forEach(DNA::calcFitness);
     }
     public void switchToNextGeneration(){
         calcMinFitnessOfGeneration();
@@ -381,7 +387,11 @@ public class DNAPool {
         DNA [] dnas = getFiveBestGenes();
 
         for(int i = 0; i < nextGeneration.length; i++){
-            nextGeneration[i] = dnas[getRandomPos(dnas.length)];
+
+            int pos = getRandomPos(dnas.length);
+            if(pos < 0 || pos >= dnas.length)
+                System.out.println();
+            nextGeneration[i] = dnas[pos];
         }
     }
 
