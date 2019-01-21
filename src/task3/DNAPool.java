@@ -368,6 +368,7 @@ public class DNAPool {
                 break;
             case 2:
                 replicationSchemaTwo();
+                break;
             default:
                 throw new RuntimeException("please input replication schema");
         }

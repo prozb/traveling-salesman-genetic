@@ -75,6 +75,7 @@ public class Main {
         calculateDistances(map, geneLen);
         // TODO: 12.01.19
 
+
         //creating simulations to be executed by thread pool
         if(Constants.GRAPH_SIMULATION) {
             for (int i = 0; i < permNumber; i++) {
@@ -90,17 +91,21 @@ public class Main {
             simulations.add(simulation);
         }
 
-        executors.invokeAll(simulations)
-                .stream()
-                .map(future -> {
-                    try{
-                        return future.get();
-                    }catch (Exception e){
-                        throw new IllegalStateException(e);
-                    }
-                })
-                .forEach(Main::pushIntoBuilder);
-        executors.shutdown();
+        try {
+            executors.invokeAll(simulations)
+                    .stream()
+                    .map(future -> {
+                        try {
+                            return future.get();
+                        } catch (Exception e) {
+                            throw new IllegalStateException(e);
+                        }
+                    })
+                    .forEach(Main::pushIntoBuilder);
+            executors.shutdown();
+        }catch (Exception e){
+            Main.logger.error(TAG, e);
+        }
 
         logger.info("Finished " + Simulation.counter + " simulations");
         if(Constants.GRAPH_SIMULATION) {
