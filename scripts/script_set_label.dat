@@ -1,0 +1,7 @@
+gset pm3d at bs
+set grid
+set contour
+set label 1 "x-axis pm" at graph 1.2,0.5,-0.6 font "Times,18"
+set label 2 "y-axis pc" at graph 0.5,-0.1,-0.6 font "Times,18" 
+set label 3 "z-axis gener" at graph -0.2,-0.2,0.5 font "Times,18"
+replot

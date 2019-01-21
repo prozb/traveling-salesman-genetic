@@ -1,7 +1,5 @@
 package task3;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
-
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
@@ -170,8 +168,8 @@ public class Simulation implements Callable<String>{
             if(Constants.TSP_RANDOM) {
                 pushDist(pool.getMinFitnessGeneral());
             }
-            if(runsCount == 100 || runsCount == 300 || runsCount == 700 || runsCount == 1500 || runsCount == 2000)
-                Main.logger.info("runs count = " + runsCount);
+//            if(runsCount == 100 || runsCount == 300 || runsCount == 700 || runsCount == 1500 || runsCount == 2000)
+//                Main.logger.info("runs count = " + runsCount);
             runsCount--;
         }
         Main.logger.info("generation: " + (pool.getGenerationsCount() - 1) + " min fitness general: "
